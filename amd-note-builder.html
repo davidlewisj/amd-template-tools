@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AMD Note Builder</title>
+<title>In-Line Narrative Template Designer</title>
 <style>
 /* ── RESET & BASE ── */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,6 +45,31 @@ header {
 }
 header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 .header-actions { display: flex; align-items: center; gap: 6px; }
+/* ── SHARED APP NAV ── */
+.app-nav {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 16px; height: 40px; flex-shrink: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.app-nav-left { display: flex; align-items: center; gap: 10px; }
+.app-nav-logo { display:flex; align-items:center; gap:7px; text-decoration:none; color:var(--text2); padding:4px 8px; border-radius:var(--radius-sm); transition:color 0.12s, background 0.12s; }
+.app-nav-logo:hover { color: var(--blue); background: var(--blue-lt); }
+.app-nav-logo svg { color: var(--blue); flex-shrink: 0; }
+.app-nav-sep { width: 1px; height: 16px; background: var(--border2); flex-shrink: 0; }
+.app-nav-tool { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--text); }
+.app-nav-tool svg { color: var(--blue); }
+.app-nav-switcher { display: flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 3px; }
+.app-nav-switch {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 500; color: var(--text2);
+  padding: 3px 10px; border-radius: 16px; cursor: pointer;
+  border: none; background: transparent; font-family: inherit;
+  transition: all 0.15s; text-decoration: none; white-space: nowrap;
+}
+.app-nav-switch:hover { color: var(--text); background: var(--surface); }
+.app-nav-switch.active { background: var(--surface); color: var(--blue); font-weight: 600; box-shadow: var(--shadow-sm); cursor: default; }
+.app-nav-switch.active svg { color: var(--blue); }
+
 .undo-redo { display: flex; gap: 2px; }
 .modified-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); display: none; margin-left: 2px; flex-shrink: 0; }
 .modified-dot.visible { display: inline-block; }
@@ -88,7 +113,7 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
   background: var(--surface); border-radius: 12px;
   box-shadow: var(--shadow-md);
   padding: 48px 56px; min-height: 200px;
-  font-family: Georgia, serif; font-size: 14px; line-height: 1.75;
+  font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; font-size: 14px; line-height: 1.75;
   color: var(--text);
   border: 1px solid var(--border);
 }
@@ -169,6 +194,75 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
   white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.12s; z-index: 500;
 }
 .sab-btn:hover::after { opacity: 1; }
+
+
+/* ── DRAG HANDLE (matching email designer) ── */
+.sec-drag-handle {
+  display: none; position: absolute; top: 8px; left: 8px; z-index: 50;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 4px 5px; cursor: grab; color: var(--text3);
+  align-items: center; justify-content: center; box-shadow: var(--shadow-sm);
+  transition: border-color 0.12s, color 0.12s;
+}
+.sec-drag-handle:active { cursor: grabbing; }
+.sec-drag-handle:hover { border-color: var(--blue); color: var(--blue); }
+.note-section.active .sec-drag-handle { display: flex; }
+
+/* ── SECTION TYPE LABEL (matching email designer) ── */
+.sec-type-label {
+  display: none; position: absolute; top: 8px; left: 40px; z-index: 30;
+  background: var(--blue); color: #fff;
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+  padding: 3px 7px; border-radius: 20px; pointer-events: none;
+  animation: labelIn 0.15s ease;
+}
+@keyframes labelIn { from { opacity:0; transform:translateY(-3px); } to { opacity:1; transform:translateY(0); } }
+.note-section.active .sec-type-label { display: block; }
+
+/* ── DROP INDICATOR ── */
+.drop-indicator { height: 2px; background: var(--blue); border-radius: 2px; margin: 0; pointer-events: none; box-shadow: 0 0 6px rgba(59,130,246,0.4); }
+.note-section.dragging-sec { opacity: 0.4; pointer-events: none; }
+
+/* ── CONTENTEDITABLE FOCUS RING ── */
+[contenteditable]:focus { outline: none; background: rgba(59,130,246,0.04); border-radius: 2px; }
+
+/* ── TABLE REBUILD ── */
+.note-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 4px 0; }
+.note-table td, .note-table th {
+  padding: 7px 10px; border: 1px solid var(--border);
+  vertical-align: top; min-width: 60px; cursor: text;
+  transition: background 0.1s;
+}
+.note-table td[contenteditable]:focus, .note-table th[contenteditable]:focus {
+  background: rgba(59,130,246,0.04); outline: none;
+}
+.note-table tr.header-row td, .note-table tr.header-row th {
+  font-weight: 700; background: var(--surface2); color: var(--text);
+}
+.note-table td.cell-selected { outline: 2px solid var(--blue); outline-offset: -2px; }
+.table-toolbar {
+  display: flex; align-items: center; gap: 4px; margin-top: 6px; flex-wrap: wrap;
+}
+.tbl-btn {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text2); cursor: pointer;
+  font-size: 11px; font-weight: 500; padding: 4px 8px; font-family: inherit;
+  display: flex; align-items: center; gap: 4px; transition: all 0.12s;
+}
+.tbl-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-lt); }
+.tbl-btn.danger:hover { border-color: var(--red); color: var(--red); background: #fef2f2; }
+.tbl-btn svg { pointer-events: none; }
+
+/* ── HEADING LEVEL SELECTOR ── */
+.heading-level-picker { display: flex; gap: 3px; flex-wrap: wrap; }
+.hl-btn {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text2); cursor: pointer;
+  font-size: 11px; font-weight: 600; padding: 4px 8px; font-family: inherit;
+  transition: all 0.12s; min-width: 28px; text-align: center;
+}
+.hl-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-lt); }
+.hl-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
 /* ── ADD STRIP ── */
 .add-strip {
@@ -257,14 +351,17 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 @keyframes mfFlash { 0% { background: rgba(217,119,6,0.25); } 100% { background: transparent; } }
 .mf-flash { animation: mfFlash 0.4s ease; }
 
+/* AMD bookmark spans on canvas — styled to match AMD's visual pill */
+.note-sec-inner .amds-narrative-template-field,
 .note-sec-inner .mceNonEditable {
   display: inline;
-  background: rgba(217,119,6,0.08);
-  border-bottom: 2px solid var(--amber);
-  border-radius: 2px;
-  padding: 0 1px;
+  background: #e7edf1;
+  border-radius: 3px;
+  padding: 1px 5px;
   cursor: default;
   user-select: none;
+  white-space: nowrap;
+  font-size: 0.9em;
 }
 
 /* ── MERGE FIELD PANEL PICKER ── */
@@ -310,29 +407,79 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 .sf-legend svg { flex-shrink: 0; margin-top: 1px; }
 
 /* ── SPLASH ── */
-#splash { position: fixed; inset: 0; z-index: 50000; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 24px; }
-.splash-box { width: 100%; max-width: 780px; display: flex; flex-direction: column; gap: 32px; }
-.splash-head { text-align: center; }
-.splash-head h1 { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; margin-bottom: 6px; }
-.splash-head p { font-size: 13px; color: var(--text2); }
-.splash-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.splash-scratch { background: var(--surface); border: 1.5px solid var(--border2); border-radius: var(--radius-lg); padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 14px; cursor: pointer; transition: all 0.18s; text-align: center; }
-.splash-scratch:hover { border-color: var(--blue); background: var(--blue-lt); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.splash-scratch .sc-icon { font-size: 32px; }
-.splash-scratch h2 { font-size: 14px; font-weight: 600; color: var(--text); }
-.splash-scratch p { font-size: 12px; color: var(--text2); line-height: 1.55; }
-.splash-tpls { background: var(--surface); border: 1.5px solid var(--border2); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 8px; }
-.splash-tpls h2 { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 4px; }
-.tpl-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 11px 14px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 12px; }
-.tpl-card:hover { border-color: var(--blue); background: var(--blue-lt); }
-.tpl-info h3 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 1px; }
-.tpl-info p { font-size: 11px; color: var(--text2); line-height: 1.35; }
-.splash-resume-card { background: var(--surface); border: 1.5px solid var(--blue); border-radius: var(--radius-lg); padding: 14px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.15s; margin-bottom: 16px; }
-.splash-resume-card:hover { background: var(--blue-lt); box-shadow: var(--shadow-md); }
-.splash-resume-icon { width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--blue-lt); border: 1px solid var(--blue-mid); display: flex; align-items: center; justify-content: center; color: var(--blue); flex-shrink: 0; }
-.splash-resume-info { flex: 1; }
-.splash-resume-info h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
-.splash-resume-info p { font-size: 11px; color: var(--text2); }
+#splash {
+  position: fixed; inset: 0; z-index: 50000;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.splash-wrap {
+  width: 100%; max-width: 480px;
+  display: flex; flex-direction: column; gap: 24px;
+  padding: 40px 24px;
+  margin: 0 auto; flex: 1; justify-content: center;
+}
+.splash-brand { text-align: center; }
+.splash-brand-eye {
+  display: inline-block;
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--blue);
+  background: var(--blue-lt); border: 1px solid var(--blue-mid);
+  border-radius: 20px; padding: 4px 12px; margin-bottom: 12px;
+}
+.splash-brand h1 { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; margin-bottom: 6px; }
+.splash-brand p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+/* Resume */
+.splash-resume {
+  background: var(--surface); border: 1.5px solid var(--blue);
+  border-radius: var(--radius-lg); padding: 14px 18px;
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  transition: all 0.15s;
+}
+.splash-resume:hover { background: var(--blue-lt); box-shadow: var(--shadow-md); }
+.splash-resume-icon {
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+  background: var(--blue-lt); border: 1px solid var(--blue-mid);
+  display: flex; align-items: center; justify-content: center; color: var(--blue); flex-shrink: 0;
+}
+.splash-resume-text { flex: 1; }
+.splash-resume-text strong { font-size: 13px; font-weight: 600; color: var(--text); display: block; margin-bottom: 1px; }
+.splash-resume-text span { font-size: 11px; color: var(--text2); }
+/* Start options */
+.splash-start { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.splash-start-btn {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: var(--radius-md); padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s;
+}
+.splash-start-btn:hover { border-color: var(--blue); background: var(--blue-lt); }
+.splash-start-icon {
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  background: var(--surface2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; color: var(--blue); flex-shrink: 0;
+}
+.splash-start-btn:hover .splash-start-icon { background: var(--blue-lt); border-color: var(--blue-mid); }
+.splash-start-text strong { font-size: 12px; font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
+.splash-start-text span { font-size: 11px; color: var(--text2); }
+/* Template list */
+.splash-tpl-list {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: var(--radius-lg); overflow: hidden;
+}
+.splash-tpl-header {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px;
+  color: var(--text3); padding: 12px 16px 8px; border-bottom: 1px solid var(--border);
+}
+.splash-tpl-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 11px 16px; cursor: pointer; transition: background 0.12s; border-bottom: 1px solid var(--border);
+}
+.splash-tpl-item:last-child { border-bottom: none; }
+.splash-tpl-item:hover { background: var(--blue-lt); }
+.splash-tpl-item:hover .tpl-arrow { color: var(--blue); }
+.splash-tpl-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.splash-tpl-desc { font-size: 11px; color: var(--text2); }
+.tpl-arrow { color: var(--text3); flex-shrink: 0; transition: color 0.12s; }
 
 /* ── PREVIEW MODAL ── */
 #preview-modal { position: fixed; inset: 0; z-index: 60000; background: rgba(0,0,0,0.6); display: none; align-items: flex-start; justify-content: center; padding: 0; overflow-y: auto; }
@@ -343,7 +490,7 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 .preview-note { font-size: 11px; color: rgba(255,255,255,0.5); text-align: center; flex: 1; }
 .preview-close { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); cursor: pointer; padding: 6px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; font-family: inherit; display: flex; align-items: center; gap: 6px; transition: background 0.12s; }
 .preview-close:hover { background: rgba(255,255,255,0.2); color: #fff; }
-#preview-card { width: 100%; max-width: 820px; background: var(--surface); border-radius: 12px; padding: 56px 64px; font-family: Georgia, serif; font-size: 14px; line-height: 1.75; color: var(--text); box-shadow: var(--shadow-lg); }
+#preview-card { width: 100%; max-width: 820px; background: var(--surface); border-radius: 12px; padding: 56px 64px; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; font-size: 14px; line-height: 1.75; color: var(--text); box-shadow: var(--shadow-lg); }
 #preview-card h3 { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text3); padding-bottom: 4px; border-bottom: 1px solid var(--border); margin-bottom: 8px; margin-top: 20px; }
 #preview-card h3:first-child { margin-top: 0; }
 #preview-card p { margin-bottom: 8px; }
@@ -387,58 +534,87 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 
 <!-- SPLASH -->
 <div id="splash">
-  <div class="splash-box">
-    <div class="splash-head">
-      <h1>Note Builder</h1>
-      <p>Build clinical note templates with smart fields for AMD's TinyMCE editor</p>
+<div class="app-nav" style="flex-shrink:0;">
+  <div class="app-nav-left">
+    <a class="app-nav-logo" href="index.html" title="Home">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </a>
+  </div>
+  <div class="app-nav-switcher">
+    <a class="app-nav-switch" href="amd-email-designer.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Email Designer</a>
+    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Narrative Designer</span>
+  </div>
+</div>
+  <div class="splash-wrap">
+    <div class="splash-brand">
+      <div class="splash-brand-eye">Center Suite Tools</div>
+      <h1>In-Line Narrative Template Designer</h1>
+      <p>Build structured clinical note templates for AMD's narrative template editor</p>
     </div>
     <div id="splash-resume" style="display:none;">
-      <div class="splash-resume-card" onclick="resumeSession()">
+      <div class="splash-resume" onclick="resumeSession()">
         <div class="splash-resume-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><polyline points="12 7 12 12 15 15"/></svg>
         </div>
-        <div class="splash-resume-info">
-          <h3>Resume Last Session</h3>
-          <p id="splash-resume-meta">Continue where you left off</p>
+        <div class="splash-resume-text">
+          <strong>Resume Last Session</strong>
+          <span id="splash-resume-meta">Continue where you left off</span>
         </div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
     </div>
-    <div class="splash-choices">
-      <div style="display:flex;flex-direction:column;gap:16px;">
-        <div class="splash-scratch" onclick="startScratch()">
-          <span class="sc-icon">✦</span>
-          <h2>Start from Scratch</h2>
-          <p>Blank note — build your clinical template section by section</p>
+    <div class="splash-start">
+      <div class="splash-start-btn" onclick="startScratch()">
+        <div class="splash-start-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </div>
-        <div class="splash-scratch" onclick="window.open('amd-email-designer.html','_blank')" style="padding:18px 24px;flex-direction:row;justify-content:space-between;gap:16px;text-align:left;">
-          <div style="display:flex;flex-direction:column;gap:4px;">
-            <h2 style="font-size:13px;">Template Designer</h2>
-            <p style="font-size:11px;">Visual email templates for AMD messaging</p>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+        <div class="splash-start-text">
+          <strong>Start from Scratch</strong>
+          <span>Blank note, build block by block</span>
         </div>
       </div>
-      <div class="splash-tpls">
-        <h2>Pre-built Note Templates</h2>
-        <div class="tpl-card" onclick="startTemplate('hst_consult')"><div class="tpl-info"><h3>Initial HST Consultation</h3><p>Chief complaint, sleep history, assessment & plan</p></div></div>
-        <div class="tpl-card" onclick="startTemplate('sleep_interp')"><div class="tpl-info"><h3>Sleep Study Interpretation</h3><p>Study findings, AHI/RDI, interpretation & recommendations</p></div></div>
-        <div class="tpl-card" onclick="startTemplate('osd_fitting')"><div class="tpl-info"><h3>OSD Fitting Note</h3><p>Device details, fitting notes & follow-up plan</p></div></div>
-        <div class="tpl-card" onclick="startTemplate('followup')"><div class="tpl-info"><h3>Follow-Up Visit Note</h3><p>Interval history, compliance review & assessment</p></div></div>
-        <div class="tpl-card" onclick="startTemplate('cpap_setup')"><div class="tpl-info"><h3>CPAP/DME Setup Note</h3><p>Device setup, settings, education & supplies</p></div></div>
+      <div class="splash-start-btn" onclick="toggleTplList()">
+        <div class="splash-start-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </div>
+        <div class="splash-start-text">
+          <strong>Use a Template</strong>
+          <span>5 pre-built clinical notes</span>
+        </div>
       </div>
+    </div>
+    <div class="splash-tpl-list" id="splash-tpl-list" style="display:none;">
+      <div class="splash-tpl-header">Pre-built Templates</div>
+      <div class="splash-tpl-item" onclick="startTemplate('hst_consult')"><div><div class="splash-tpl-name">Initial HST Consultation</div><div class="splash-tpl-desc">Chief complaint, sleep history, assessment &amp; plan</div></div><svg class="tpl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="splash-tpl-item" onclick="startTemplate('sleep_interp')"><div><div class="splash-tpl-name">Sleep Study Interpretation</div><div class="splash-tpl-desc">Study findings, AHI/RDI, interpretation &amp; recommendations</div></div><svg class="tpl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="splash-tpl-item" onclick="startTemplate('osd_fitting')"><div><div class="splash-tpl-name">OSD Fitting Note</div><div class="splash-tpl-desc">Device details, fitting notes &amp; follow-up plan</div></div><svg class="tpl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="splash-tpl-item" onclick="startTemplate('followup')"><div><div class="splash-tpl-name">Follow-Up Visit Note</div><div class="splash-tpl-desc">Interval history, compliance review &amp; assessment</div></div><svg class="tpl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="splash-tpl-item" onclick="startTemplate('cpap_setup')"><div><div class="splash-tpl-name">CPAP/DME Setup Note</div><div class="splash-tpl-desc">Device setup, settings, education &amp; supplies</div></div><svg class="tpl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
     </div>
   </div>
 </div>
 
 <!-- HEADER -->
+<div class="app-nav" style="flex-shrink:0;">
+  <div class="app-nav-left">
+    <a class="app-nav-logo" href="index.html" title="Home">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </a>
+  </div>
+  <div class="app-nav-switcher">
+    <a class="app-nav-switch" href="amd-email-designer.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Email Designer</a>
+    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Narrative Designer</span>
+  </div>
+</div>
+  <div class="app-nav-switcher">
+    <a class="app-nav-switch" href="amd-email-designer.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Template Designer</a>
+    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> In-Line Narrative Template Designer</span>
+  </div>
+</div>
 <header>
   <h1>
-    <button class="ghost-btn" onclick="returnToSplash()" title="Home" style="padding:0 8px;">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    </button>
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-    Note Builder
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    In-Line Narrative Template Designer
     <span class="modified-dot" id="modified-dot"></span>
   </h1>
   <div class="header-actions">
@@ -559,9 +735,12 @@ let lastFocusedEditable = null, lastFocusedSecId = null, lastFocusedField = null
 let lastSavedRange = null;
 let histTimer = null;
 let editDebounce = null;
+let dragSrcId = null;
+let tableDragStart = null; // {secId, row, col}
+let tableSelCells = [];    // [{row,col}] currently selected cells
 
 let G = {
-  font: 'Georgia,serif',
+  font: "'Helvetica Neue',Helvetica,Arial,sans-serif",
   fontSize: 14,
 };
 
@@ -589,15 +768,18 @@ function resumeSession() {
 // ── UTILS ────────────────────────────────────────────────────────────────────
 function uid() { return '_' + Math.random().toString(36).slice(2,9); }
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
-function SF(token) { return `<span class="mceNonEditable" contenteditable="false">&lt;&lt;${token}&gt;&gt;</span>`; }
+// AMD bookmark span — used in pre-built templates
+function SF(token) {
+  return `<span contenteditable="false" data-bookmark-additional class="amds-narrative-template-field">${token}</span>\u00a0`;
+}
 
 // ── DEFAULTS ─────────────────────────────────────────────────────────────────
 const D = {
-  heading:   { type:'heading',   label:'Heading',   text:'Section Heading' },
-  paragraph: { type:'paragraph', label:'Paragraph', html:'' },
-  list:      { type:'list',      label:'List',      listType:'ul', items:[''] },
-  table:     { type:'table',     label:'Table',     rows:[['Field','Value'],['Field','Value']] },
-  divider:   { type:'divider',   label:'Divider' },
+  heading:   { type:'heading',   label:'Heading',   text:'Section Heading', level:'h3', bg:'', color:'' },
+  paragraph: { type:'paragraph', label:'Paragraph', html:'', bg:'' },
+  list:      { type:'list',      label:'List',      listType:'ul', items:[''], bg:'' },
+  table:     { type:'table',     label:'Table',     rows:[['',''],['','']], cellBgs:{}, hasHeaderRow:false, bg:'' },
+  divider:   { type:'divider',   label:'Divider', bg:'' },
   spacer:    { type:'spacer',    label:'Spacer',    height:20 },
 };
 
@@ -606,14 +788,14 @@ const TPLS = {
   hst_consult: () => [
     { ...clone(D.heading),   id:uid(), text:'Patient Information' },
     { ...clone(D.table),     id:uid(), rows:[
-      ['Patient',`${SF('PT_NAME')}`],
+      ['Patient',`${SF('PatientName')}`],
       ['Date of Birth',''],
-      ['Date of Visit',`${SF('APPT_DATE')}`],
-      ['Provider',`${SF('PR_NAME')}`],
-      ['Facility',`${SF('FAC_NAME')}`],
+      ['Date of Visit',`${SF('ApptDateLinkedNote')}`],
+      ['Provider',`${SF('ProviderName')}`],
+      ['Facility',`${SF('GroupName')}`],
     ]},
     { ...clone(D.heading),   id:uid(), text:'Chief Complaint' },
-    { ...clone(D.paragraph), id:uid(), html:`${SF('PT_FIRSTNAME')} presents for initial consultation regarding suspected sleep-disordered breathing.` },
+    { ...clone(D.paragraph), id:uid(), html:`${SF('PatientFirstName')} presents for initial consultation regarding suspected sleep-disordered breathing.` },
     { ...clone(D.heading),   id:uid(), text:'Sleep History' },
     { ...clone(D.paragraph), id:uid(), html:'Patient reports snoring, witnessed apneas, and excessive daytime sleepiness. Epworth Sleepiness Scale score: ___. Patient denies insomnia, restless legs, or parasomnias.' },
     { ...clone(D.heading),   id:uid(), text:'Medical History' },
@@ -624,24 +806,24 @@ const TPLS = {
       ['Mallampati score',''],['Tonsil grade',''],['Retrognathia',''],
     ]},
     { ...clone(D.heading),   id:uid(), text:'Assessment' },
-    { ...clone(D.paragraph), id:uid(), html:`${SF('PT_FIRSTNAME')} is a ___ year old patient presenting with symptoms consistent with obstructive sleep apnea. Clinical presentation warrants further evaluation with home sleep testing.` },
+    { ...clone(D.paragraph), id:uid(), html:`${SF('PatientFirstName')} is a ___ year old patient presenting with symptoms consistent with obstructive sleep apnea. Clinical presentation warrants further evaluation with home sleep testing.` },
     { ...clone(D.heading),   id:uid(), text:'Plan' },
     { ...clone(D.list),      id:uid(), listType:'ol', items:[
-      `Home sleep test ordered. Device to be picked up at ${SF('FAC_NAME')}.`,
+      `Home sleep test ordered. Device to be picked up at ${SF('GroupName')}.`,
       'Patient education provided regarding sleep hygiene and positional therapy.',
       'Return for results interpretation and treatment discussion following test completion.',
-      `Follow-up scheduled. Contact us at ${SF('FAC_PHONE')} with questions.`,
+      `Follow-up scheduled. Contact us at ${SF('GroupPhone')} with questions.`,
     ]},
   ],
 
   sleep_interp: () => [
     { ...clone(D.heading),   id:uid(), text:'Patient Information' },
     { ...clone(D.table),     id:uid(), rows:[
-      ['Patient',`${SF('PT_NAME')}`],
+      ['Patient',`${SF('PatientName')}`],
       ['Date of Birth',''],
-      ['Study Date',`${SF('APPT_DATE')}`],
-      ['Interpreting Provider',`${SF('PR_NAME')}`],
-      ['Ordering Facility',`${SF('FAC_NAME')}`],
+      ['Study Date',`${SF('ApptDateLinkedNote')}`],
+      ['Interpreting Provider',`${SF('ProviderName')}`],
+      ['Ordering Facility',`${SF('GroupName')}`],
     ]},
     { ...clone(D.heading),   id:uid(), text:'Study Type & Device' },
     { ...clone(D.table),     id:uid(), rows:[
@@ -659,26 +841,26 @@ const TPLS = {
       ['Snoring index',''],
     ]},
     { ...clone(D.heading),   id:uid(), text:'Interpretation' },
-    { ...clone(D.paragraph), id:uid(), html:`The results of ${SF('PT_FIRSTNAME')}'s home sleep test are consistent with <strong>___ (mild / moderate / severe)</strong> obstructive sleep apnea based on an AHI of ___ events/hour. ` },
+    { ...clone(D.paragraph), id:uid(), html:`The results of ${SF('PatientFirstName')}'s home sleep test are consistent with <strong>___ (mild / moderate / severe)</strong> obstructive sleep apnea based on an AHI of ___ events/hour. ` },
     { ...clone(D.heading),   id:uid(), text:'Recommendations' },
     { ...clone(D.list),      id:uid(), listType:'ol', items:[
       'Positive airway pressure (PAP) therapy is recommended as first-line treatment.',
       'Oral appliance therapy (OAT) is an appropriate alternative for mild-moderate OSA or PAP-intolerant patients.',
       'Weight loss counseling provided.',
       'Return to clinic to discuss treatment options and initiate therapy.',
-      `Contact ${SF('FAC_NAME')} at ${SF('FAC_PHONE')} with questions.`,
+      `Contact ${SF('GroupName')} at ${SF('GroupPhone')} with questions.`,
     ]},
     { ...clone(D.heading),   id:uid(), text:'Provider Signature' },
-    { ...clone(D.paragraph), id:uid(), html:`${SF('PR_NAME')}, ${SF('PR_TITLE')}<br>Date: ${SF('APPT_DATE')}` },
+    { ...clone(D.paragraph), id:uid(), html:`${SF('ProviderName')}, ${SF('ProviderFullName')}<br>Date: ${SF('ApptDateLinkedNote')}` },
   ],
 
   osd_fitting: () => [
     { ...clone(D.heading),   id:uid(), text:'Patient Information' },
     { ...clone(D.table),     id:uid(), rows:[
-      ['Patient',`${SF('PT_NAME')}`],
-      ['Date of Visit',`${SF('APPT_DATE')}`],
-      ['Provider',`${SF('PR_NAME')}`],
-      ['Facility',`${SF('FAC_NAME')}`],
+      ['Patient',`${SF('PatientName')}`],
+      ['Date of Visit',`${SF('ApptDateLinkedNote')}`],
+      ['Provider',`${SF('ProviderName')}`],
+      ['Facility',`${SF('GroupName')}`],
     ]},
     { ...clone(D.heading),   id:uid(), text:'Device Details' },
     { ...clone(D.table),     id:uid(), rows:[
@@ -686,7 +868,7 @@ const TPLS = {
       ['Lower arch size',''],['Initial advancement setting',''],['Serial number',''],
     ]},
     { ...clone(D.heading),   id:uid(), text:'Fitting Notes' },
-    { ...clone(D.paragraph), id:uid(), html:`Device was fitted for ${SF('PT_FIRSTNAME')} today. Fit was assessed for comfort, retention, and occlusal balance. Patient reported the device as <strong>comfortable / acceptable / requiring adjustment</strong>. ` },
+    { ...clone(D.paragraph), id:uid(), html:`Device was fitted for ${SF('PatientFirstName')} today. Fit was assessed for comfort, retention, and occlusal balance. Patient reported the device as <strong>comfortable / acceptable / requiring adjustment</strong>. ` },
     { ...clone(D.heading),   id:uid(), text:'Bite Registration & Occlusion' },
     { ...clone(D.paragraph), id:uid(), html:'Bite registration obtained at ___% of maximum protrusion. Occlusal contacts noted as ___. No significant TMJ discomfort elicited during fitting.' },
     { ...clone(D.heading),   id:uid(), text:'Patient Instructions' },
@@ -699,21 +881,21 @@ const TPLS = {
       'Return for follow-up in 2–4 weeks to assess response and adjust if needed.',
     ]},
     { ...clone(D.heading),   id:uid(), text:'Follow-Up Plan' },
-    { ...clone(D.paragraph), id:uid(), html:`Follow-up appointment scheduled. ${SF('PT_FIRSTNAME')} instructed to contact ${SF('FAC_NAME')} at ${SF('FAC_PHONE')} if experiencing significant discomfort, tooth pain, or jaw soreness prior to next visit.` },
+    { ...clone(D.paragraph), id:uid(), html:`Follow-up appointment scheduled. ${SF('PatientFirstName')} instructed to contact ${SF('GroupName')} at ${SF('GroupPhone')} if experiencing significant discomfort, tooth pain, or jaw soreness prior to next visit.` },
     { ...clone(D.heading),   id:uid(), text:'Provider Signature' },
-    { ...clone(D.paragraph), id:uid(), html:`${SF('PR_NAME')}, ${SF('PR_TITLE')}<br>Date: ${SF('APPT_DATE')}` },
+    { ...clone(D.paragraph), id:uid(), html:`${SF('ProviderName')}, ${SF('ProviderFullName')}<br>Date: ${SF('ApptDateLinkedNote')}` },
   ],
 
   followup: () => [
     { ...clone(D.heading),   id:uid(), text:'Patient Information' },
     { ...clone(D.table),     id:uid(), rows:[
-      ['Patient',`${SF('PT_NAME')}`],
-      ['Date of Visit',`${SF('APPT_DATE')}`],
-      ['Provider',`${SF('PR_NAME')}`],
+      ['Patient',`${SF('PatientName')}`],
+      ['Date of Visit',`${SF('ApptDateLinkedNote')}`],
+      ['Provider',`${SF('ProviderName')}`],
       ['Visit Type','Follow-Up'],
     ]},
     { ...clone(D.heading),   id:uid(), text:'Interval History' },
-    { ...clone(D.paragraph), id:uid(), html:`${SF('PT_FIRSTNAME')} returns for follow-up evaluation. Since last visit, patient reports <strong>improvement / no change / worsening</strong> of sleep quality. ` },
+    { ...clone(D.paragraph), id:uid(), html:`${SF('PatientFirstName')} returns for follow-up evaluation. Since last visit, patient reports <strong>improvement / no change / worsening</strong> of sleep quality. ` },
     { ...clone(D.heading),   id:uid(), text:'Treatment Compliance Review' },
     { ...clone(D.table),     id:uid(), rows:[
       ['Treatment modality',''],['Nightly usage (avg hrs)',''],
@@ -722,25 +904,25 @@ const TPLS = {
     { ...clone(D.heading),   id:uid(), text:'Examination' },
     { ...clone(D.paragraph), id:uid(), html:'Patient appears well. Airway examination unchanged from baseline. Oral appliance fit remains adequate with no signs of wear or distortion. No new dental or TMJ concerns noted.' },
     { ...clone(D.heading),   id:uid(), text:'Assessment' },
-    { ...clone(D.paragraph), id:uid(), html:`${SF('PT_FIRSTNAME')}'s OSA is <strong>well-controlled / partially controlled / not adequately controlled</strong> on current therapy. Patient demonstrates <strong>good / fair / poor</strong> compliance. ` },
+    { ...clone(D.paragraph), id:uid(), html:`${SF('PatientFirstName')}'s OSA is <strong>well-controlled / partially controlled / not adequately controlled</strong> on current therapy. Patient demonstrates <strong>good / fair / poor</strong> compliance. ` },
     { ...clone(D.heading),   id:uid(), text:'Plan' },
     { ...clone(D.list),      id:uid(), listType:'ol', items:[
       'Continue current therapy with adjustments as noted.',
       'Reinforce compliance and sleep hygiene education.',
       'Repeat objective testing ordered if indicated.',
-      `Follow-up in ___ months. Contact ${SF('FAC_NAME')} at ${SF('FAC_PHONE')} with concerns.`,
+      `Follow-up in ___ months. Contact ${SF('GroupName')} at ${SF('GroupPhone')} with concerns.`,
     ]},
     { ...clone(D.heading),   id:uid(), text:'Provider Signature' },
-    { ...clone(D.paragraph), id:uid(), html:`${SF('PR_NAME')}, ${SF('PR_TITLE')}<br>Date: ${SF('APPT_DATE')}` },
+    { ...clone(D.paragraph), id:uid(), html:`${SF('ProviderName')}, ${SF('ProviderFullName')}<br>Date: ${SF('ApptDateLinkedNote')}` },
   ],
 
   cpap_setup: () => [
     { ...clone(D.heading),   id:uid(), text:'Patient Information' },
     { ...clone(D.table),     id:uid(), rows:[
-      ['Patient',`${SF('PT_NAME')}`],
-      ['Date of Setup',`${SF('APPT_DATE')}`],
-      ['Setup Performed By',`${SF('PR_NAME')}`],
-      ['Facility',`${SF('FAC_NAME')}`],
+      ['Patient',`${SF('PatientName')}`],
+      ['Date of Setup',`${SF('ApptDateLinkedNote')}`],
+      ['Setup Performed By',`${SF('ProviderName')}`],
+      ['Facility',`${SF('GroupName')}`],
     ]},
     { ...clone(D.heading),   id:uid(), text:'Device & Settings' },
     { ...clone(D.table),     id:uid(), rows:[
@@ -773,9 +955,9 @@ const TPLS = {
       'Patient questions answered to satisfaction.',
     ]},
     { ...clone(D.heading),   id:uid(), text:'Follow-Up Plan' },
-    { ...clone(D.paragraph), id:uid(), html:`Follow-up scheduled in 30 days to review compliance data and assess therapy response. ${SF('PT_FIRSTNAME')} instructed to contact ${SF('FAC_NAME')} at ${SF('FAC_PHONE')} with any equipment issues or concerns prior to next visit.` },
+    { ...clone(D.paragraph), id:uid(), html:`Follow-up scheduled in 30 days to review compliance data and assess therapy response. ${SF('PatientFirstName')} instructed to contact ${SF('GroupName')} at ${SF('GroupPhone')} with any equipment issues or concerns prior to next visit.` },
     { ...clone(D.heading),   id:uid(), text:'Provider Signature' },
-    { ...clone(D.paragraph), id:uid(), html:`${SF('PR_NAME')}, ${SF('PR_TITLE')}<br>Date: ${SF('APPT_DATE')}` },
+    { ...clone(D.paragraph), id:uid(), html:`${SF('ProviderName')}, ${SF('ProviderFullName')}<br>Date: ${SF('ApptDateLinkedNote')}` },
   ],
 };
 
@@ -786,6 +968,7 @@ function dismissSplash() {
   setTimeout(() => { el.style.display = 'none'; el.style.opacity = ''; }, 260);
 }
 function returnToSplash() {
+  window.location.href = 'index.html'; return;
   saveActiveEditable(); closePanel(); selectedId = null;
   const el = document.getElementById('splash');
   el.style.display = 'flex'; el.style.opacity = '0'; el.style.transition = 'opacity 0.25s';
@@ -800,7 +983,8 @@ function returnToSplash() {
     metaEl.textContent = `${saved.sections.length} block${saved.sections.length===1?'':'s'} · Last saved ${when}`;
   }
 }
-function startScratch()     { sections = []; selectedId = null; pushHist(); renderCanvas(); dismissSplash(); setModified(false); }
+function startScratch() { sections = []; selectedId = null; pushHist(); renderCanvas(); dismissSplash(); setModified(false); }
+
 function startTemplate(k)   { sections = TPLS[k](); selectedId = null; pushHist(); renderCanvas(); dismissSplash(); setModified(false); }
 
 // ── HISTORY ──────────────────────────────────────────────────────────────────
@@ -939,16 +1123,65 @@ function renderCanvas() {
     return;
   }
 
+  const dragGrip = `<svg width="12" height="16" viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1.5" fill="currentColor"/><circle cx="8" cy="3" r="1.5" fill="currentColor"/><circle cx="4" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="4" cy="13" r="1.5" fill="currentColor"/><circle cx="8" cy="13" r="1.5" fill="currentColor"/></svg>`;
+
   sections.forEach((sec, idx) => {
     const wrap = document.createElement('div');
     wrap.className = 'note-section' + (sec.id === selectedId ? ' active' : '') + (sec.hidden ? ' hidden-sec' : '');
     wrap.dataset.id = sec.id;
     wrap.dataset.idx = idx;
-    wrap.innerHTML = `<div class="note-sec-inner">${buildSecDOM(sec)}</div>${buildActionBar(sec)}`;
+    wrap.draggable = true;
+
+    const inner = document.createElement('div');
+    inner.className = 'note-sec-inner';
+    if (sec.bg) inner.style.background = sec.bg;
+    inner.innerHTML =
+      `<div class="sec-drag-handle" title="Drag to reorder">${dragGrip}</div>` +
+      `<div class="sec-type-label">${sec.label}</div>` +
+      buildSecDOM(sec);
+    wrap.appendChild(inner);
+    wrap.insertAdjacentHTML('beforeend', buildActionBar(sec));
+
     wrap.addEventListener('click', e => {
-      if (e.target.closest('.note-action-bar') || e.target.closest('[contenteditable]')) return;
+      if (e.target.closest('.note-action-bar') || e.target.closest('[contenteditable]') || e.target.closest('.table-toolbar') || e.target.closest('.sec-drag-handle')) return;
       selectSec(sec.id);
     });
+
+    // Drag-and-drop reorder
+    wrap.addEventListener('dragstart', e => {
+      dragSrcId = sec.id; e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', sec.id);
+      setTimeout(() => wrap.classList.add('dragging-sec'), 0);
+    });
+    wrap.addEventListener('dragend', () => {
+      wrap.classList.remove('dragging-sec'); dragSrcId = null;
+      document.querySelectorAll('.drop-indicator').forEach(el => el.remove());
+    });
+    wrap.addEventListener('dragover', e => {
+      if (!dragSrcId || dragSrcId === sec.id) return;
+      e.preventDefault();
+      document.querySelectorAll('.drop-indicator').forEach(el => el.remove());
+      const after = e.clientY > wrap.getBoundingClientRect().top + wrap.offsetHeight / 2;
+      const ind = document.createElement('div'); ind.className = 'drop-indicator';
+      after ? wrap.after(ind) : wrap.before(ind);
+    });
+    wrap.addEventListener('dragleave', e => {
+      if (!e.relatedTarget || !e.relatedTarget.closest('#note-card'))
+        document.querySelectorAll('.drop-indicator').forEach(el => el.remove());
+    });
+    wrap.addEventListener('drop', e => {
+      e.preventDefault();
+      if (!dragSrcId || dragSrcId === sec.id) return;
+      document.querySelectorAll('.drop-indicator').forEach(el => el.remove());
+      const srcIdx = sections.findIndex(s => s.id === dragSrcId);
+      const destIdx = parseInt(wrap.dataset.idx);
+      const after = e.clientY > wrap.getBoundingClientRect().top + wrap.offsetHeight / 2;
+      const [moved] = sections.splice(srcIdx, 1);
+      const insertAt = srcIdx < destIdx ? (after ? destIdx : destIdx-1) : (after ? destIdx+1 : destIdx);
+      sections.splice(Math.max(0, insertAt), 0, moved);
+      dragSrcId = null; pushHist(); renderCanvas();
+    });
+
     card.appendChild(wrap);
   });
 
@@ -1022,14 +1255,15 @@ function wireEditables() {
     updatePlaceholder();
     el.addEventListener('input', () => { onEditableInput(el); updatePlaceholder(); });
     el.addEventListener('focus', () => {
-      // Activate this section when an editable is focused
       selectedId = el.dataset.secId;
       document.querySelectorAll('.note-section').forEach(s => s.classList.toggle('active', s.dataset.id === el.dataset.secId));
       openPanel(el.dataset.secId);
     });
     el.addEventListener('blur', updatePlaceholder);
-    el.addEventListener('mousedown', e => e.stopPropagation());
+    el.addEventListener('mousedown', e => { e.stopPropagation(); });
     el.addEventListener('click', e => e.stopPropagation());
+    // Prevent drag-and-drop from firing on contenteditable table cells
+    el.addEventListener('dragstart', e => e.stopPropagation());
   });
 }
 
@@ -1037,8 +1271,19 @@ function wireEditables() {
 function buildSecDOM(sec) {
   const f = G.font, fs = G.fontSize;
   switch(sec.type) {
-    case 'heading':
-      return `<div class="note-heading" contenteditable="true" data-sec-id="${sec.id}" data-field="text" data-placeholder="Section heading…">${sec.text||''}</div>`;
+    case 'heading': {
+      const lvl = sec.level || 'h3';
+      const styles = {
+        h1: 'font-size:28px;font-weight:800;line-height:1.2;margin:8px 0 4px;',
+        h2: 'font-size:22px;font-weight:700;line-height:1.3;margin:8px 0 4px;',
+        h3: 'font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);padding-bottom:4px;margin:8px 0 4px;',
+        h4: 'font-size:14px;font-weight:700;margin:6px 0 2px;',
+        h5: 'font-size:13px;font-weight:600;font-style:italic;margin:4px 0 2px;',
+        h6: 'font-size:12px;font-weight:600;color:var(--text2);margin:4px 0 2px;',
+      };
+      const colorStyle = sec.color ? `color:${sec.color};` : '';
+      return `<div contenteditable="true" data-sec-id="${sec.id}" data-field="text" data-placeholder="Heading…" style="${styles[lvl]||styles.h3}${colorStyle}font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;">${sec.text||''}</div>`;
+    }
 
     case 'paragraph':
       return `<div class="note-body" contenteditable="true" data-sec-id="${sec.id}" data-field="html" data-placeholder="Begin typing your clinical note…" style="font-family:${f};font-size:${fs}px;">${sec.html||''}</div>`;
@@ -1052,15 +1297,32 @@ function buildSecDOM(sec) {
     }
 
     case 'table': {
-      const rows = (sec.rows || []).map((row, r) =>
-        `<tr>${row.map((cell, c) =>
-          `<td>${editable(sec.id,'cell',cell,r===0&&c===0?'Field':'Value',`font-family:${f};font-size:13px;`,`data-row="${r}" data-col="${c}"`)}</td>`
-        ).join('')}</tr>`
-      ).join('');
+      const cellBgs = sec.cellBgs || {};
+      const rows = (sec.rows || []).map((row, r) => {
+        const isHeader = sec.hasHeaderRow && r === 0;
+        const cells = row.map((cell, c) => {
+          const key = `${r}_${c}`;
+          const bgStyle = cellBgs[key] ? `background:${cellBgs[key]};` : (isHeader ? 'background:var(--surface2);' : '');
+          const fwStyle = isHeader ? 'font-weight:700;' : '';
+          return `<td contenteditable="true" data-sec-id="${sec.id}" data-field="cell" data-row="${r}" data-col="${c}"
+            style="${bgStyle}${fwStyle}"
+            onmousedown="tableDragBegin(event,'${sec.id}',${r},${c})"
+            onmouseover="tableDragOver(event,'${sec.id}',${r},${c})"
+            data-placeholder="">${cell||''}</td>`;
+        }).join('');
+        return `<tr class="${isHeader?'header-row':''}">${cells}</tr>`;
+      }).join('');
+
+      const plusR = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+      const minR  = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
       return `<table class="note-table"><tbody>${rows}</tbody></table>
-        <div style="display:flex;gap:6px;margin-top:4px;">
-          <button onclick="addTableRow('${sec.id}')" style="background:none;border:none;color:var(--blue);font-size:11px;cursor:pointer;font-family:inherit;">+ Row</button>
-          <button onclick="addTableCol('${sec.id}')" style="background:none;border:none;color:var(--blue);font-size:11px;cursor:pointer;font-family:inherit;">+ Column</button>
+        <div class="table-toolbar">
+          <button class="tbl-btn" onclick="addTableRow('${sec.id}')">${plusR} Row</button>
+          <button class="tbl-btn danger" onclick="removeTableRow('${sec.id}')">${minR} Row</button>
+          <button class="tbl-btn" onclick="addTableCol('${sec.id}')">${plusR} Col</button>
+          <button class="tbl-btn danger" onclick="removeTableCol('${sec.id}')">${minR} Col</button>
+          <button class="tbl-btn" onclick="toggleHeaderRow('${sec.id}')">${sec.hasHeaderRow?'Remove':'Add'} Header</button>
+          <button class="tbl-btn" onclick="mergeSelectedCells('${sec.id}')">Merge</button>
         </div>`;
     }
 
@@ -1093,10 +1355,98 @@ function addTableRow(id) {
   sec.rows.push(Array(cols).fill(''));
   pushHist(); skipSaveOnRender = true; renderCanvas();
 }
+function removeTableRow(id) {
+  saveActiveEditable();
+  const sec = getSec(id); if (!sec || !sec.rows || sec.rows.length <= 1) return;
+  sec.rows.pop();
+  pushHist(); skipSaveOnRender = true; renderCanvas();
+}
 function addTableCol(id) {
   saveActiveEditable();
   const sec = getSec(id); if (!sec || !sec.rows) return;
   sec.rows = sec.rows.map(r => [...r, '']);
+  pushHist(); skipSaveOnRender = true; renderCanvas();
+}
+function removeTableCol(id) {
+  saveActiveEditable();
+  const sec = getSec(id); if (!sec || !sec.rows) return;
+  const cols = sec.rows[0] ? sec.rows[0].length : 0;
+  if (cols <= 1) return;
+  sec.rows = sec.rows.map(r => r.slice(0, -1));
+  // Also clean up cellBgs for removed col
+  if (sec.cellBgs) {
+    Object.keys(sec.cellBgs).forEach(k => {
+      const [, c] = k.split('_').map(Number);
+      if (c >= cols - 1) delete sec.cellBgs[k];
+    });
+  }
+  pushHist(); skipSaveOnRender = true; renderCanvas();
+}
+function toggleHeaderRow(id) {
+  saveActiveEditable();
+  const sec = getSec(id); if (!sec) return;
+  sec.hasHeaderRow = !sec.hasHeaderRow;
+  pushHist(); skipSaveOnRender = true; renderCanvas();
+}
+function mergeSelectedCells(id) {
+  // Simple colspan merge — merges all selected cells in the same row into the leftmost
+  if (!tableSelCells.length) return;
+  saveActiveEditable();
+  const sec = getSec(id); if (!sec || !sec.rows) return;
+  // Group selected cells by row
+  const byRow = {};
+  tableSelCells.forEach(({row, col}) => {
+    if (!byRow[row]) byRow[row] = [];
+    byRow[row].push(col);
+  });
+  Object.entries(byRow).forEach(([r, cols]) => {
+    if (cols.length < 2) return;
+    cols.sort((a,b) => a-b);
+    const ri = parseInt(r);
+    // Combine content into first cell
+    const combined = cols.map(c => sec.rows[ri][c]).filter(Boolean).join(' ');
+    sec.rows[ri][cols[0]] = combined;
+    // Mark merged cells as null (will be skipped in render)
+    cols.slice(1).forEach(c => { sec.rows[ri][c] = null; });
+    // Store colspan on the data
+    if (!sec.colspans) sec.colspans = {};
+    sec.colspans[`${ri}_${cols[0]}`] = cols.length;
+  });
+  tableSelCells = [];
+  pushHist(); skipSaveOnRender = true; renderCanvas();
+}
+
+// Table cell drag-select
+let _tDragging = false;
+function tableDragBegin(e, secId, r, c) {
+  if (e.button !== 0) return;
+  _tDragging = true;
+  tableSelCells = [{row:r, col:c}];
+  tableDragStart = {secId, row:r, col:c};
+  updateCellSelection(secId);
+}
+function tableDragOver(e, secId, r, c) {
+  if (!_tDragging || !tableDragStart || tableDragStart.secId !== secId) return;
+  const r0 = Math.min(tableDragStart.row, r), r1 = Math.max(tableDragStart.row, r);
+  const c0 = Math.min(tableDragStart.col, c), c1 = Math.max(tableDragStart.col, c);
+  tableSelCells = [];
+  for (let rr = r0; rr <= r1; rr++)
+    for (let cc = c0; cc <= c1; cc++)
+      tableSelCells.push({row:rr, col:cc});
+  updateCellSelection(secId);
+}
+document.addEventListener('mouseup', () => { _tDragging = false; });
+function updateCellSelection(secId) {
+  document.querySelectorAll(`[data-sec-id="${secId}"][data-field="cell"]`).forEach(td => {
+    const r = parseInt(td.dataset.row), c = parseInt(td.dataset.col);
+    td.classList.toggle('cell-selected', tableSelCells.some(s => s.row===r && s.col===c));
+  });
+}
+function applySelCellBg(secId, color) {
+  saveActiveEditable();
+  const sec = getSec(secId); if (!sec) return;
+  if (!sec.cellBgs) sec.cellBgs = {};
+  tableSelCells.forEach(({row, col}) => { sec.cellBgs[`${row}_${col}`] = color; });
   pushHist(); skipSaveOnRender = true; renderCanvas();
 }
 
@@ -1175,7 +1525,15 @@ function renderFpBody() {
   }
   const sec = getSec(selectedId);
   if (!sec) return;
-  title.innerHTML = sec.label;
+  const iconMap = {
+    heading:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h8M4 18h12"/></svg>`,
+    paragraph: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3H5l-2 2 2 16h14l2-16z"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="14" y2="16"/></svg>`,
+    list:      `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>`,
+    table:     `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg>`,
+    divider:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="12" x2="22" y2="12"/></svg>`,
+    spacer:    `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="5" rx="1"/><rect x="4" y="17" width="16" height="5" rx="1"/><line x1="12" y1="8" x2="12" y2="16"/></svg>`,
+  };
+  title.innerHTML = `${iconMap[sec.type]||''} ${sec.label}`;
   body.innerHTML = activeTab === 'style' ? styleControls(sec) : contentControls(sec);
 }
 
@@ -1236,32 +1594,62 @@ function applyToSmartFields(cmd, val) {
 }
 
 function styleControls(sec) {
+  const id = sec.id;
+  const bgRow = `<hr class="panel-sep">${row('Section background', `<input type="color" value="${sec.bg||'#ffffff'}" onchange="notePropChange('${id}','bg',this.value)">`)}`;
+
   switch(sec.type) {
-    case 'heading':   return row('Text color', `<input type="color" value="#a09a94" oninput="noteStyleChange('${sec.id}','headingColor',this.value)">`);
-    case 'paragraph': return `<div style="font-size:11px;color:var(--text2);">Paragraph styling is controlled in the Content tab toolbar.</div>`;
+    case 'heading': {
+      const lvl = sec.level || 'h3';
+      const levels = ['h1','h2','h3','h4','h5','h6'];
+      const picker = `<div class="heading-level-picker">${levels.map(l =>
+        `<button class="hl-btn${lvl===l?' active':''}" onclick="notePropChange('${id}','level','${l}')">${l.toUpperCase()}</button>`
+      ).join('')}</div>`;
+      return `<div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Heading Level</div>
+        ${picker}
+        <hr class="panel-sep">
+        ${row('Text color', `<input type="color" value="${sec.color||'#1a1714'}" onchange="notePropChange('${id}','color',this.value)">`)}
+        ${bgRow}`;
+    }
+    case 'paragraph':
+      return row('Text color hint', `<div style="font-size:11px;color:var(--text2);">Use the toolbar in Content tab.</div>`) + bgRow;
     case 'list':
-      return row('List type',`<select onchange="notePropChange('${sec.id}','listType',this.value)"><option value="ul"${sec.listType==='ul'?' selected':''}>Bullet (•)</option><option value="ol"${sec.listType==='ol'?' selected':''}>Numbered (1.)</option></select>`);
-    case 'spacer':    return row('Height (px)', `<input type="number" value="${sec.height||20}" min="4" max="120" oninput="notePropChange('${sec.id}','height',parseInt(this.value))" style="width:65px">`);
-    case 'table':     return `<div style="font-size:11px;color:var(--text2);">Use + Row and + Column buttons in the block to add rows and columns.</div>`;
-    case 'divider':   return `<div style="font-size:11px;color:var(--text2);">Visual separator between sections.</div>`;
+      return row('List type',`<select onchange="notePropChange('${id}','listType',this.value)"><option value="ul"${sec.listType==='ul'?' selected':''}>Bullet (•)</option><option value="ol"${sec.listType==='ol'?' selected':''}>Numbered (1.)</option></select>`) + bgRow;
+    case 'spacer':
+      return row('Height (px)', `<input type="number" value="${sec.height||20}" min="4" max="120" oninput="notePropChange('${id}','height',parseInt(this.value))" style="width:65px">`) + bgRow;
+    case 'table': {
+      const selInfo = tableSelCells.length
+        ? `<div style="font-size:10px;color:var(--text2);margin-bottom:6px;">${tableSelCells.length} cell${tableSelCells.length>1?'s':''} selected</div>
+           ${row('Cell background', `<input type="color" value="#ffffff" onchange="applySelCellBg('${id}',this.value)">`)}`
+        : `<div style="font-size:10px;color:var(--text3);">Click and drag across cells to select, then apply a background color.</div>`;
+      return selInfo + bgRow;
+    }
+    case 'divider':
+      return `<div style="font-size:11px;color:var(--text2);">Visual separator — no style options.</div>`;
     default: return '';
   }
 }
 
 function contentControls(sec) {
   const secText = JSON.stringify(sec);
-  const hasSF   = /mceNonEditable/.test(secText);
+  const hasSF   = /amds-narrative-template-field/.test(secText);
   const sfLegend = hasSF ? `<div class="sf-legend">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <span>Smart fields inherit your text styling on canvas. They output as AMD <code style="background:rgba(217,119,6,0.12);padding:1px 4px;border-radius:3px;font-size:10px;">red tokens</code> on copy.</span>
+    <span>Bookmarks show as grey pills on canvas and auto-populate from the patient chart in AMD.</span>
   </div>` : '';
+
   switch(sec.type) {
-    case 'heading':   return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click the heading text on canvas to edit it directly.</div>`;
-    case 'paragraph': return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click the text on canvas to edit. Use the toolbar to format selected text.</div>` + fmtToolbar();
-    case 'list':      return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click any list item on canvas to edit it. Use + Add item to add more.</div>` + fmtToolbar();
-    case 'table':     return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click any cell on canvas to edit it. Use + Row and + Column to expand the table.</div>`;
-    case 'divider':   return `<div style="font-size:11px;color:var(--text2);">A horizontal rule — no content to edit.</div>`;
-    case 'spacer':    return `<div style="font-size:11px;color:var(--text2);">Adjust height in the Style tab.</div>`;
+    case 'heading':
+      return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click the heading to edit. Use the Style tab to change heading level (H1–H6) and color.</div>` + fmtToolbar();
+    case 'paragraph':
+      return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click the text to edit. Use the toolbar to format selected text or insert bookmarks.</div>` + fmtToolbar();
+    case 'list':
+      return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click any list item to edit. Use + Add item to add more.</div>` + fmtToolbar();
+    case 'table':
+      return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click any cell to edit. Drag across cells to select multiple. Use toolbar to format text or insert bookmarks.</div>` + fmtToolbar();
+    case 'divider':
+      return `<div style="font-size:11px;color:var(--text2);">A horizontal rule — no content to edit.</div>`;
+    case 'spacer':
+      return `<div style="font-size:11px;color:var(--text2);">Adjust height in the Style tab.</div>`;
     default: return '';
   }
 }
@@ -1276,6 +1664,7 @@ function noteStyleChange(id, key, val) { notePropChange(id, key, val); }
 
 function globalControls() {
   const fonts = [
+    ["'Helvetica Neue',Helvetica,Arial,sans-serif",'Helvetica Neue','Helvetica Neue, sans-serif'],
     ['Georgia,serif','Georgia','Georgia, serif'],
     ["'Times New Roman',Times,serif",'Times New Roman','Times New Roman, serif'],
     ["-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",'System Sans','sans-serif'],
@@ -1302,33 +1691,126 @@ function gFontChange(val) { G.font = val; skipSaveOnRender = true; renderCanvas(
 function gFontSizeChange(val) { G.fontSize = val; skipSaveOnRender = true; renderCanvas(); }
 
 // ── SMART FIELDS ─────────────────────────────────────────────────────────────
+// AMD Narrative Template Bookmarks
+// Format: <span contenteditable="false" data-bookmark-additional class="amds-narrative-template-field">BookmarkName</span>&nbsp;
 const MERGE_FIELDS = [
-  { cat:'Patient',           label:'Patient Name',             token:'PT_NAME' },
-  { cat:'Patient',           label:'Patient First Name',       token:'PT_FIRSTNAME' },
-  { cat:'Patient',           label:'Patient Last Name',        token:'PT_LASTNAME' },
-  { cat:'Patient',           label:'Preferred First Name',     token:'PREF_PATIENT_FIRST_NAME' },
-  { cat:'Responsible Party', label:'RP Name',                  token:'RESP_NAME' },
-  { cat:'Responsible Party', label:'RP First Name',            token:'RESP_FIRST_NAME' },
-  { cat:'Provider',          label:'Provider Name',            token:'PR_NAME' },
-  { cat:'Provider',          label:'Provider Title',           token:'PR_TITLE' },
-  { cat:'Provider',          label:'Preferred Provider Name',  token:'PREF_PROVIDER_NAME' },
-  { cat:'Appointment',       label:'Appt Date',                token:'APPT_DATE' },
-  { cat:'Appointment',       label:'Appt Time',                token:'APPT_TIME' },
-  { cat:'Appointment',       label:'Appt Date/Time',           token:'APPT_DATETIME' },
-  { cat:'Appointment',       label:'Appt Reason',              token:'APPT_REASON' },
-  { cat:'Appointment',       label:'Appt Instructions',        token:'APPT_INSTRUCTIONS' },
-  { cat:'Practice',          label:'Practice Name',            token:'PRAC_NAME' },
-  { cat:'Practice',          label:'Practice Address',         token:'PRAC_ADDRESS' },
-  { cat:'Practice',          label:'Practice City/State/Zip',  token:'PRAC_CITYSTATEZIP' },
-  { cat:'Practice',          label:'Practice Phone',           token:'PRAC_PHONE' },
-  { cat:'Facility',          label:'Facility Name',            token:'FAC_NAME' },
-  { cat:'Facility',          label:'Facility Address',         token:'FAC_ADDRESS' },
-  { cat:'Facility',          label:'Facility City/State/Zip',  token:'FAC_CITYSTATEZIP' },
-  { cat:'Facility',          label:'Facility Phone',           token:'FAC_PHONE' },
-  { cat:'Facility',          label:'Facility Location',        token:'FAC_LOCATION' },
-  { cat:'Other',             label:'Online Scheduling Link',   token:'INTAKE_SCHEDULING_URL' },
-  { cat:'Other',             label:'Telehealth Visit URL',     token:'VISIT_URL' },
-  { cat:'Other',             label:'Recall Due Date',          token:'RECALL_DUEDATE' },
+  // Patient
+  { cat:'Patient', label:'Patient Name',            token:'PatientName' },
+  { cat:'Patient', label:'Patient First Name',      token:'PatientFirstName' },
+  { cat:'Patient', label:'Patient Last Name',       token:'PatientLastName' },
+  { cat:'Patient', label:'Patient Preferred Name',  token:'PatientPreferredFirstName' },
+  { cat:'Patient', label:'Patient DOB',             token:'PatientDOB' },
+  { cat:'Patient', label:'Patient Age',             token:'PatientAge' },
+  { cat:'Patient', label:'Patient Age & Gender',    token:'PatientAgeGender' },
+  { cat:'Patient', label:'Patient Gender',          token:'PatientGender' },
+  { cat:'Patient', label:'Patient ID',              token:'PatientID' },
+  { cat:'Patient', label:'Patient Med Rec No',      token:'PatientMedRecNo' },
+  { cat:'Patient', label:'Patient Address',         token:'PatientAddress' },
+  { cat:'Patient', label:'Patient Street',          token:'PatientStreet' },
+  { cat:'Patient', label:'Patient City/State/Zip',  token:'PatientCityStateZip' },
+  { cat:'Patient', label:'Patient Phone 1',         token:'PatientPhone1' },
+  { cat:'Patient', label:'Patient Phone 2',         token:'PatientPhone2' },
+  { cat:'Patient', label:'Patient Preferred Phone', token:'PatientPreferredPhone' },
+  { cat:'Patient', label:'Patient Email',           token:'PatientEmail' },
+  { cat:'Patient', label:'Patient Race',            token:'PatientRace' },
+  { cat:'Patient', label:'Patient Ethnicity',       token:'PatientEthnicity' },
+  { cat:'Patient', label:'Patient Language',        token:'PatientLanguage' },
+  { cat:'Patient', label:'Patient Allergies',       token:'PatientAllergies' },
+  { cat:'Patient', label:'Patient NKDA',            token:'PatientNKDA' },
+  { cat:'Patient', label:'Patient Demo',            token:'PatientDemo' },
+  { cat:'Patient', label:'Patient PCP',             token:'PatientPCP' },
+  { cat:'Patient', label:'Patient Pharmacy',        token:'PatientPharmacy' },
+  { cat:'Patient', label:'Patient Employer',        token:'PatientEmployer' },
+  { cat:'Patient', label:'Patient SSN',             token:'PatientSSN' },
+  // Responsible Party
+  { cat:'Responsible Party', label:'RP Name',           token:'ResponsiblePartyName' },
+  { cat:'Responsible Party', label:'RP Address',        token:'ResponsiblePartyAddress' },
+  { cat:'Responsible Party', label:'RP City/State/Zip', token:'ResponsiblePartyCityStateZip' },
+  { cat:'Responsible Party', label:'RP DOB',            token:'ResponsiblePartyDOB' },
+  { cat:'Responsible Party', label:'RP Email',          token:'ResponsiblePartyEmail' },
+  { cat:'Responsible Party', label:'RP Employer',       token:'ResponsiblePartyEmployer' },
+  { cat:'Responsible Party', label:'RP Pref Phone',     token:'ResponsiblePartyPrefPhone' },
+  // Provider
+  { cat:'Provider', label:'Provider Name',          token:'ProviderName' },
+  { cat:'Provider', label:'Provider Full Name',     token:'ProviderFullName' },
+  { cat:'Provider', label:'Provider Demo',          token:'ProviderDemo' },
+  { cat:'Provider', label:'Provider Address',       token:'ProviderAddress' },
+  { cat:'Provider', label:'Provider Street',        token:'ProviderStreet' },
+  { cat:'Provider', label:'Provider City/State/Zip',token:'ProviderCityStateZip' },
+  { cat:'Provider', label:'Provider Phone',         token:'ProviderPhone1' },
+  { cat:'Provider', label:'Provider Fax',           token:'ProviderFax' },
+  { cat:'Provider', label:'Provider Email',         token:'ProviderEmail' },
+  { cat:'Provider', label:'Provider NPI',           token:'ProviderNPI' },
+  { cat:'Provider', label:'Provider Fed ID',        token:'ProviderFedID' },
+  { cat:'Provider', label:'Provider Practice',      token:'ProviderPractice' },
+  // Appointment
+  { cat:'Appointment', label:'Appt Date',           token:'ApptDateLinkedNote' },
+  { cat:'Appointment', label:'Appt Provider',       token:'ApptProviderLinkedNote' },
+  { cat:'Appointment', label:'Note Date',           token:'NoteDate' },
+  { cat:'Appointment', label:'Current Date',        token:'CurrentDate' },
+  { cat:'Appointment', label:'Last Date of Service',token:'LastDOS' },
+  { cat:'Appointment', label:'Next Appt Date',      token:'NextApptDate' },
+  { cat:'Appointment', label:'Last Kept Appt',      token:'LastKeptAppt' },
+  // Practice / Group
+  { cat:'Practice', label:'Group Name',             token:'GroupName' },
+  { cat:'Practice', label:'Group Address',          token:'GroupAddress' },
+  { cat:'Practice', label:'Group Phone',            token:'GroupPhone' },
+  { cat:'Practice', label:'Group Fax',              token:'GroupFax' },
+  { cat:'Practice', label:'Group Demo',             token:'GroupDemo' },
+  { cat:'Practice', label:'Practice Address',       token:'PracticeAddress' },
+  { cat:'Practice', label:'Signed By',              token:'SignedBy' },
+  { cat:'Practice', label:'Signed By All',          token:'SignedByAll' },
+  // Medications
+  { cat:'Medications', label:'Current Meds',                 token:'CurrentMeds' },
+  { cat:'Medications', label:'Current Meds Detail',          token:'CurrentMedsDetail' },
+  { cat:'Medications', label:'Current Meds Drug/Strength',   token:'CurrentMedsDrugStrengthFreq' },
+  { cat:'Medications', label:'Current Meds No Label',        token:'CurrentMedsNoLabel' },
+  { cat:'Medications', label:'Encounter Meds',               token:'EncounterMeds' },
+  { cat:'Medications', label:'Encounter Meds Detail',        token:'EncounterMedsDetail' },
+  { cat:'Medications', label:'Historical Meds Detail',       token:'HistoricalMedsDetail' },
+  { cat:'Medications', label:'Medication Management Note',   token:'MedicationManagementNote' },
+  { cat:'Medications', label:'Med Summary List',             token:'MedSummaryList' },
+  // Problems & Diagnoses
+  { cat:'Problems', label:'Problem List',                    token:'ProblemList' },
+  { cat:'Problems', label:'Problem List (Chronic)',          token:'ProblemListChronic' },
+  { cat:'Problems', label:'Problem List (Current)',          token:'ProblemListCurrent' },
+  { cat:'Problems', label:'Problem List (Historic)',         token:'ProblemListHistoric' },
+  { cat:'Problems', label:'Problem List (ICD-10)',           token:'ProblemListICD10' },
+  { cat:'Problems', label:'Charge Primary Diagnosis',       token:'ChargePrimaryDiagnosis' },
+  // Results & Orders
+  { cat:'Results', label:'Encounter Orders',                 token:'EncounterOrders' },
+  { cat:'Results', label:'Encounter Results',                token:'EncounterResults' },
+  { cat:'Results', label:'Last Lab Results',                 token:'LastLabResults' },
+  { cat:'Results', label:'Last Test Results',                token:'LastTestResults' },
+  { cat:'Results', label:'Patient Last Lab Results',         token:'PatientLastLabResults' },
+  // Referring Physician
+  { cat:'Referring', label:'Referring Phys Name',            token:'ReferringPhysName' },
+  { cat:'Referring', label:'Referring Phys Demo',            token:'ReferringPhysDemo' },
+  { cat:'Referring', label:'Referring Phys Address',         token:'ReferringPhysAddress' },
+  { cat:'Referring', label:'Referring Phys Phone',           token:'ReferringPhysPhone' },
+  { cat:'Referring', label:'Referring Phys Fax',             token:'ReferringPhysFax' },
+  { cat:'Referring', label:'Referring Phys Appt',            token:'ReferringPhysAppt' },
+  // Insurance
+  { cat:'Insurance', label:'Primary Ins Company',            token:'PatientPrimaryInsCo' },
+  { cat:'Insurance', label:'Primary Ins Group',              token:'PatientPrimaryInsGroup' },
+  { cat:'Insurance', label:'Primary Ins Policy #',           token:'PatientPrimaryInsPolicyNum' },
+  { cat:'Insurance', label:'Primary Ins Sub Name',           token:'PatientPrimaryInsSubName' },
+  { cat:'Insurance', label:'Secondary Ins Company',          token:'PatientSecondaryInsCo' },
+  { cat:'Insurance', label:'Secondary Ins Group',            token:'PatientSecondaryInsGroup' },
+  { cat:'Insurance', label:'Secondary Ins Policy #',         token:'PatientSecondaryInsPolicyNum' },
+  // Clinical
+  { cat:'Clinical', label:'Allergies & Reaction',            token:'AllergiesReaction' },
+  { cat:'Clinical', label:'Current Allergies',               token:'CurrentAllergies' },
+  { cat:'Clinical', label:'Immunizations (All)',             token:'PatientImmunizationsAll' },
+  { cat:'Clinical', label:'Immunizations (Today)',           token:'PatientImmunizationsToday' },
+  { cat:'Clinical', label:'Problem List (Code & Desc)',      token:'ProblemListCodeDesc' },
+  { cat:'Clinical', label:'SOAP',                            token:'SOAP' },
+  { cat:'Clinical', label:'Treatment Plan',                  token:'TreatmentPlan' },
+  { cat:'Clinical', label:'Visit Summary',                   token:'VisitSummary' },
+  { cat:'Clinical', label:'Patient Risk Factors (Current)',  token:'PatientRiskFactorsCurrent' },
+  { cat:'Clinical', label:'Patient Risk Factors (Historic)', token:'PatientRiskFactorsHistoric' },
+  { cat:'Clinical', label:'HW Completed Today',             token:'HWCompletedToday' },
+  { cat:'Clinical', label:'HW Due',                         token:'HWDue' },
 ];
 
 function buildPanelMFList(query) {
@@ -1342,7 +1824,7 @@ function buildPanelMFList(query) {
     fields.forEach(f => {
       html += `<div class="mf-item" onclick="insertSmartField('${f.token}')">
         <span class="mf-item-label">${f.label}</span>
-        <span class="mf-item-token">&lt;&lt;${f.token}&gt;&gt;</span>
+        <span class="mf-item-token">${f.token}</span>
       </div>`;
     });
   });
@@ -1387,7 +1869,7 @@ function doInsertSmartField(token, secId, field) {
   historyStack[historyIdx] = clone(sections);
 
   // Append the smart field span to the section data
-  const spanHTML = `<span class="mceNonEditable" contenteditable="false">&lt;&lt;${token}&gt;&gt;</span>\u00a0`;
+  const spanHTML = `<span contenteditable="false" data-bookmark-additional class="amds-narrative-template-field">${token}</span>\u00a0`;
   if (field === 'item') {
     const el = lastFocusedEditable;
     const idx = el ? parseInt(el.dataset.idx) : -1;
@@ -1491,7 +1973,7 @@ function renderTriggerList(query) {
       const focused = idx === triggerFocusIdx;
       html += `<div class="mft-item${focused?' focused':''}" data-token="${f.token}" data-idx="${idx}" onclick="triggerSelect('${f.token}')">
         <span class="mft-item-label">${f.label}</span>
-        <span class="mft-item-token">&lt;&lt;${f.token}&gt;&gt;</span>
+        <span class="mft-item-token">${f.token}</span>
       </div>`;
       idx++;
     });
@@ -1530,10 +2012,11 @@ function applyFindReplace() {
   const msg  = document.getElementById('fr-result');
   if (!from || !to || from === to) { if (msg) msg.textContent = 'Select different fields'; return; }
   let count = 0;
-  const toSpan = `<span class="mceNonEditable" contenteditable="false">&lt;&lt;${to}&gt;&gt;</span>`;
+  const toSpan = `<span contenteditable="false" data-bookmark-additional class="amds-narrative-template-field">${to}</span>\u00a0`;
   const replaceIn = html => {
     if (!html) return html;
-    return html.replace(new RegExp(`<span[^>]*class="mceNonEditable"[^>]*>&lt;&lt;${from}&gt;&gt;<\\/span>`,'g'), () => { count++; return toSpan; });
+    const re = new RegExp(`<span[^>]*class="amds-narrative-template-field"[^>]*>${from}<\/span>\\u00a0?`,'g');
+    return html.replace(re, () => { count++; return toSpan; });
   };
   sections.forEach(sec => {
     ['html','text'].forEach(f => { if (sec[f]) sec[f] = replaceIn(sec[f]); });
@@ -1547,17 +2030,21 @@ function applyFindReplace() {
 // ── TinyMCE OUTPUT ────────────────────────────────────────────────────────────
 function sanitizeForMCE(html) {
   if (!html) return '';
-  // Strip contenteditable="true" from editable divs
+  // Strip contenteditable="true"
   let out = html.replace(/ contenteditable="true"/g, '');
-  // Normalize mceNonEditable spans to exact AMD format
+  // Convert old mceNonEditable <<TOKEN>> spans → AMD bookmark format
   out = out.replace(
-    /<span[^>]*class="mceNonEditable"[^>]*>&lt;&lt;([^<]+?)&gt;&gt;<\/span>/g,
-    (_, token) => `<span class="mceNonEditable" style="color: red;" contenteditable="false">&lt;&lt;${token}&gt;&gt;</span>`
+    /<span[^>]*class="mceNonEditable"[^>]*>&lt;&lt;([^<]+?)&gt;&gt;<\/span>\u00a0?/g,
+    (_, token) => `<span contenteditable="false" data-bookmark-additional class="amds-narrative-template-field">${token}</span>\u00a0`
   );
-  // Convert any raw <<TOKEN>> that slipped through
-  out = out.replace(/<<([^>]+?)>>/g,
-    (_, token) => `<span class="mceNonEditable" style="color: red;" contenteditable="false">&lt;&lt;${token}&gt;&gt;</span>`
+  // Normalise AMD bookmark spans already in correct format (strip duplicate nbsp)
+  out = out.replace(
+    /<span[^>]*class="amds-narrative-template-field"[^>]*>([^<]+?)<\/span>\u00a0?/g,
+    (_, name) => `<span contenteditable="false" data-bookmark-additional class="amds-narrative-template-field">${name}</span>\u00a0`
   );
+  // Strip any remaining raw <<TOKEN>> that slipped through
+  out = out.replace(/&lt;&lt;([^&]+?)&gt;&gt;/g, (_, token) => token);
+  out = out.replace(/<<([^>]+?)>>/g, (_, token) => token);
   return out;
 }
 
@@ -1588,13 +2075,16 @@ function buildNoteHTML() {
       }
 
       case 'table': {
-        // AMD native table: only cellspacing="0" cellpadding="0" on <table>
-        // <tbody>, <tr>, <td> all have zero attributes
-        const rows = (sec.rows || []).map(row =>
-          `<tr>${row.map(cell =>
-            `<td>${sanitizeForMCE(cell)}</td>`
-          ).join('')}</tr>`
-        ).join('');
+        const colspans = sec.colspans || {};
+        const rows = (sec.rows || []).map((row, r) => {
+          const cells = row.map((cell, c) => {
+            if (cell === null) return ''; // merged cell — skip
+            const cs = colspans[`${r}_${c}`];
+            const csAttr = cs ? ` colspan="${cs}"` : '';
+            return `<td${csAttr}>${sanitizeForMCE(cell||'')}</td>`;
+          }).join('');
+          return `<tr>${cells}</tr>`;
+        }).join('');
         html += `<table cellspacing="0" cellpadding="0"><tbody>${rows}</tbody></table>`;
         break;
       }
@@ -1659,7 +2149,7 @@ kbd{background:#f2f0ed;border:1px solid #ccc8c2;border-radius:4px;padding:1px 6p
 #copy-btn{background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit;transition:background 0.15s;}
 #copy-btn:hover{background:#2563eb;}
 #copy-btn.done{background:#16a34a;}
-#hidden{position:absolute;left:-9999px;top:0;font-family:Georgia,serif;font-size:14px;}
+#hidden{position:absolute;left:-9999px;top:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;}
 </style></head><body>
 <p><strong>Ready to copy</strong><br>Click the button below, then paste into AMD.</p>
 <button id="copy-btn" onclick="doCopy()">
@@ -1707,25 +2197,116 @@ function done(){
 
 // ── PREVIEW ───────────────────────────────────────────────────────────────────
 const SAMPLE_DATA = {
-  PT_NAME:'Maria Johnson', PT_FIRSTNAME:'Maria', PT_LASTNAME:'Johnson',
-  PREF_PATIENT_FIRST_NAME:'Maria', RESP_NAME:'Robert Johnson', RESP_FIRST_NAME:'Robert',
-  PR_NAME:'Dr. Sarah Mitchell', PR_TITLE:'Sleep Medicine Physician', PREF_PROVIDER_NAME:'Dr. Mitchell',
-  APPT_DATE:'Monday, April 7, 2025', APPT_TIME:'10:30 AM', APPT_DATETIME:'Monday, April 7, 2025 at 10:30 AM',
-  APPT_REASON:'Follow-Up Consultation', APPT_INSTRUCTIONS:'Please arrive 10 minutes early.',
-  PRAC_NAME:'TMJ Sleep Solutions NW', PRAC_ADDRESS:'1234 Silverdale Way NW',
-  PRAC_CITYSTATEZIP:'Silverdale, WA 98383', PRAC_PHONE:'(360) 555-0192',
-  FAC_NAME:'Center for TMJ & Sleep Solutions NW', FAC_ADDRESS:'1234 Silverdale Way NW',
-  FAC_CITYSTATEZIP:'Silverdale, WA 98383', FAC_PHONE:'(360) 555-0192', FAC_LOCATION:'Silverdale Office',
-  INTAKE_SCHEDULING_URL:'https://portal.example.com/schedule',
-  VISIT_URL:'https://telehealth.example.com/visit/abc123',
-  RECALL_DUEDATE:'May 15, 2025',
+  PatientName:'Maria Johnson',
+  PatientFirstName:'Maria',
+  PatientLastName:'Johnson',
+  PatientPreferredFirstName:'Maria',
+  PatientDOB:'03/15/1978',
+  PatientAge:'47',
+  PatientAgeGender:'47-year-old female',
+  PatientGender:'Female',
+  PatientID:'PT-00042',
+  PatientMedRecNo:'MR-10042',
+  PatientAddress:'456 Oak Lane, Silverdale, WA 98383',
+  PatientStreet:'456 Oak Lane',
+  PatientCityStateZip:'Silverdale, WA 98383',
+  PatientPhone1:'(360) 555-0147',
+  PatientPhone2:'(360) 555-0198',
+  PatientPreferredPhone:'(360) 555-0147',
+  PatientEmail:'maria.johnson@email.com',
+  PatientAllergies:'Penicillin (rash)',
+  PatientNKDA:'No Known Drug Allergies',
+  PatientDemo:'Maria Johnson, DOB 03/15/1978, Female',
+  PatientPCP:'Dr. James Rivera',
+  PatientPharmacy:'Silverdale Pharmacy, (360) 555-0120',
+  PatientEmployer:'Pacific Medical Center',
+  PatientRace:'White',
+  PatientEthnicity:'Non-Hispanic',
+  PatientLanguage:'English',
+  ResponsiblePartyName:'Robert Johnson',
+  ResponsiblePartyCityStateZip:'Silverdale, WA 98383',
+  ResponsiblePartyDOB:'06/22/1975',
+  ResponsiblePartyEmail:'robert.johnson@email.com',
+  ResponsiblePartyPrefPhone:'(360) 555-0147',
+  ProviderName:'Dr. Sarah Mitchell',
+  ProviderFullName:'Dr. Sarah Mitchell, MD',
+  ProviderDemo:'Sarah Mitchell, MD — Sleep Medicine',
+  ProviderAddress:'1234 Silverdale Way NW, Silverdale, WA 98383',
+  ProviderStreet:'1234 Silverdale Way NW',
+  ProviderCityStateZip:'Silverdale, WA 98383',
+  ProviderPhone1:'(360) 555-0192',
+  ProviderFax:'(360) 555-0193',
+  ProviderEmail:'smitchell@tmjsleep.com',
+  ProviderNPI:'1234567890',
+  ProviderFedID:'12-3456789',
+  ProviderPractice:'TMJ Sleep Solutions NW',
+  ApptDateLinkedNote:'Monday, April 7, 2025',
+  ApptProviderLinkedNote:'Dr. Sarah Mitchell',
+  NoteDate:'April 7, 2025',
+  CurrentDate:'April 7, 2025',
+  LastDOS:'March 3, 2025',
+  NextApptDate:'May 5, 2025',
+  LastKeptAppt:'March 3, 2025',
+  GroupName:'TMJ Sleep Solutions NW',
+  GroupAddress:'1234 Silverdale Way NW, Silverdale, WA 98383',
+  GroupPhone:'(360) 555-0192',
+  GroupFax:'(360) 555-0193',
+  GroupDemo:'TMJ Sleep Solutions NW — Sleep Medicine',
+  PracticeAddress:'1234 Silverdale Way NW, Silverdale, WA 98383',
+  SignedBy:'Dr. Sarah Mitchell, MD',
+  SignedByAll:'Dr. Sarah Mitchell, MD',
+  CurrentMeds:'Lisinopril 10mg daily, Metformin 500mg twice daily',
+  CurrentMedsDetail:'Lisinopril 10mg — once daily (Hypertension)\nMetformin 500mg — twice daily (Diabetes)',
+  CurrentMedsDrugStrengthFreq:'Lisinopril 10mg QD, Metformin 500mg BID',
+  CurrentMedsNoLabel:'Lisinopril 10mg daily',
+  EncounterMeds:'Lisinopril 10mg daily',
+  EncounterMedsDetail:'Lisinopril 10mg — once daily',
+  HistoricalMedsDetail:'Atorvastatin 20mg — discontinued 01/2024',
+  MedSummaryList:'Lisinopril 10mg QD, Metformin 500mg BID',
+  ProblemList:'1. Obstructive Sleep Apnea\n2. Hypertension\n3. Type 2 Diabetes',
+  ProblemListChronic:'Hypertension, Type 2 Diabetes',
+  ProblemListCurrent:'Obstructive Sleep Apnea',
+  ProblemListHistoric:'Seasonal Allergies (resolved)',
+  ProblemListICD10:'G47.33 — Obstructive Sleep Apnea',
+  ChargePrimaryDiagnosis:'G47.33 — Obstructive Sleep Apnea',
+  EncounterOrders:'Home Sleep Test — WatchPAT',
+  EncounterResults:'Pending',
+  LastLabResults:'HbA1c 7.2% (03/01/2025)',
+  LastTestResults:'AHI: 18.4 events/hr (02/15/2025)',
+  PatientLastLabResults:'HbA1c 7.2%',
+  ReferringPhysName:'Dr. James Rivera',
+  ReferringPhysDemo:'James Rivera, MD — Primary Care',
+  ReferringPhysAddress:'789 Medical Plaza, Silverdale, WA 98383',
+  ReferringPhysPhone:'(360) 555-0155',
+  ReferringPhysFax:'(360) 555-0156',
+  PatientPrimaryInsCo:'BlueCross BlueShield',
+  PatientPrimaryInsGroup:'GRP-4821',
+  PatientPrimaryInsPolicyNum:'XYZ123456789',
+  PatientPrimaryInsSubName:'Maria Johnson',
+  PatientSecondaryInsCo:'Medicare',
+  PatientSecondaryInsGroup:'N/A',
+  PatientSecondaryInsPolicyNum:'1EG4-TE5-MK72',
+  AllergiesReaction:'Penicillin — Rash',
+  CurrentAllergies:'Penicillin (rash)',
+  PatientImmunizationsAll:'Influenza (10/2024), COVID-19 Booster (09/2024)',
+  PatientImmunizationsToday:'None administered today',
+  ProblemListCodeDesc:'G47.33 Obstructive Sleep Apnea, I10 Hypertension',
+  SOAP:'S: Patient reports snoring and daytime sleepiness.\nO: BMI 31.2, Mallampati III.\nA: Suspected OSA.\nP: HST ordered.',
+  TreatmentPlan:'1. Home Sleep Test ordered.\n2. Return for results interpretation.',
+  VisitSummary:'New patient visit for evaluation of suspected sleep-disordered breathing.',
+  PatientRiskFactorsCurrent:'Obesity, Hypertension, Type 2 Diabetes',
+  PatientRiskFactorsHistoric:'Smoking (quit 2018)',
+  HWCompletedToday:'Sleep hygiene education handout',
+  HWDue:'Sleep diary — due at next visit',
+  MedicationManagementNote:'Medications reviewed and reconciled.',
 };
 function injectSampleData(html) {
   if (!html) return html;
-  return html
-    .replace(/<span[^>]*class="mceNonEditable"[^>]*>&lt;&lt;([^<]+?)&gt;&gt;<\/span>/g, (_, t) => SAMPLE_DATA[t.trim()] || t.trim())
-    .replace(/&lt;&lt;([^&]+?)&gt;&gt;/g, (_, t) => SAMPLE_DATA[t.trim()] || t.trim())
-    .replace(/<<([^>]+?)>>/g, (_, t) => SAMPLE_DATA[t.trim()] || t.trim());
+  // Replace AMD bookmark spans with sample data
+  return html.replace(
+    /<span[^>]*class="amds-narrative-template-field"[^>]*>([^<]+?)<\/span>\u00a0?/g,
+    (_, name) => SAMPLE_DATA[name.trim()] || name.trim()
+  );
 }
 function openPreview() {
   if (!sections.length) return;
@@ -1787,6 +2368,7 @@ document.getElementById('canvas-area').addEventListener('click', e => {
   panel.style.top  = '76px';
   renderCanvas();
   renderSnippets();
+  localStorage.setItem('amt_last_tool','nb');
 
   const saved = loadSavedSession();
   if (saved && saved.sections && saved.sections.length > 0) {

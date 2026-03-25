@@ -7,107 +7,176 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg:      #f8f7f5;
-  --surface: #ffffff;
-  --border:  #e2ddd8;
-  --border2: #ccc8c2;
-  --text:    #1a1714;
-  --text2:   #6b6560;
-  --text3:   #a09a94;
-  --blue:    #3b82f6;
-  --blue-lt: #eff6ff;
-  --shadow:  0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --bg:        #f8f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f0ed;
+  --border:    #e2ddd8;
+  --border2:   #ccc8c2;
+  --text:      #1a1714;
+  --text2:     #6b6560;
+  --text3:     #a09a94;
+  --blue:      #3b82f6;
+  --blue-lt:   #eff6ff;
+  --blue-mid:  #bfdbfe;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.04);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
 }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
   background: var(--bg); color: var(--text);
   min-height: 100vh; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 40px 24px;
 }
-.wrap { width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 40px; }
-
-.head { text-align: center; }
-.head h1 {
-  font-size: 22px; font-weight: 700; color: var(--text);
-  letter-spacing: -0.3px; margin-bottom: 8px;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
+.top-bar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 24px; height: 48px;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
 }
-.head p { font-size: 13px; color: var(--text2); line-height: 1.6; }
-
-.tools { display: flex; flex-direction: column; gap: 12px; }
-
-.tool-card {
-  background: var(--surface); border: 1.5px solid var(--border2);
-  border-radius: 14px; padding: 24px;
-  display: flex; align-items: center; gap: 20px;
-  text-decoration: none; color: inherit;
-  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
-}
-.tool-card:hover {
-  border-color: var(--blue);
-  box-shadow: var(--shadow);
-  transform: translateY(-2px);
-}
-.tool-icon {
-  width: 52px; height: 52px; border-radius: 12px;
-  background: var(--blue-lt); border: 1px solid #bfdbfe;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--blue); flex-shrink: 0;
-}
-.tool-info { flex: 1; min-width: 0; }
-.tool-info h2 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-.tool-info p  { font-size: 12px; color: var(--text2); line-height: 1.5; }
-.tool-arrow { color: var(--text3); flex-shrink: 0; transition: color 0.12s, transform 0.12s; }
-.tool-card:hover .tool-arrow { color: var(--blue); transform: translateX(3px); }
-
-.foot {
-  text-align: center;
-  font-size: 11px; color: var(--text3);
-}
+.top-bar-brand { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text); }
+.top-bar-brand svg { color: var(--blue); }
+main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 24px; gap: 36px; }
+.hero { text-align: center; max-width: 480px; }
+.hero-eye { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--blue); background: var(--blue-lt); border: 1px solid var(--blue-mid); border-radius: 20px; padding: 4px 12px; margin-bottom: 16px; }
+.hero h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); margin-bottom: 10px; }
+.hero p { font-size: 13px; color: var(--text2); line-height: 1.65; }
+#resume-banner { display: none; width: 100%; max-width: 640px; background: var(--surface); border: 1.5px solid var(--blue); border-radius: var(--radius-lg); padding: 16px 20px; flex-direction: column; gap: 10px; }
+#resume-banner.visible { display: flex; }
+.resume-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--blue); }
+.resume-items { display: flex; gap: 10px; }
+.resume-item { flex: 1; display: flex; align-items: center; gap: 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 14px; cursor: pointer; text-decoration: none; color: inherit; transition: all 0.15s; }
+.resume-item:hover { border-color: var(--blue); background: var(--blue-lt); box-shadow: var(--shadow-sm); }
+.resume-item-icon { width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--blue-lt); border: 1px solid var(--blue-mid); display: flex; align-items: center; justify-content: center; color: var(--blue); flex-shrink: 0; }
+.resume-item strong { font-size: 12px; font-weight: 600; color: var(--text); display: block; margin-bottom: 1px; }
+.resume-item span { font-size: 11px; color: var(--text2); }
+.tools { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; max-width: 640px; }
+.tool-card { background: var(--surface); border: 1.5px solid var(--border2); border-radius: var(--radius-lg); padding: 28px 24px; display: flex; flex-direction: column; gap: 18px; cursor: pointer; text-decoration: none; color: inherit; transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s; }
+.tool-card:hover { border-color: var(--blue); transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.tool-card.last-used { border-color: var(--blue-mid); }
+.tool-card-icon { width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--blue-lt); border: 1.5px solid var(--blue-mid); display: flex; align-items: center; justify-content: center; color: var(--blue); transition: background 0.15s; }
+.tool-card:hover .tool-card-icon { background: var(--blue); color: #fff; border-color: var(--blue); }
+.tool-card h2 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.tool-card p { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 12px; }
+.tool-card-foot { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid var(--border); font-size: 11px; font-weight: 600; color: var(--blue); }
+.tool-card-foot svg { transition: transform 0.15s; }
+.tool-card:hover .tool-card-foot svg { transform: translateX(3px); }
+.last-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; background: var(--blue); color: #fff; border-radius: 20px; padding: 2px 8px; }
+footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text3); border-top: 1px solid var(--border); background: var(--surface); }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="head">
-    <h1>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
-      AMD Template Tools
-    </h1>
-    <p>Build and copy email templates and clinical note templates<br>for AdvancedMD's TinyMCE editor.</p>
+<div class="top-bar">
+  <div class="top-bar-brand">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
+    AMD Template Tools
+  </div>
+</div>
+
+<main>
+  <div class="hero">
+    <div class="hero-eye">
+      Center Suite Tools
+    </div>
+    <h1>AMD Template Tools</h1>
+    <p>Two tools for building templates that paste directly into AdvancedMD's editor — complete with smart fields and AMD bookmarks.</p>
+  </div>
+
+  <div id="resume-banner">
+    <div class="resume-label">Resume where you left off</div>
+    <div class="resume-items" id="resume-items"></div>
   </div>
 
   <div class="tools">
-
-    <a class="tool-card" href="amd-email-designer.html">
-      <div class="tool-icon">
+    <a class="tool-card" href="amd-email-designer.html" id="card-ed">
+      <div class="tool-card-icon">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
       </div>
-      <div class="tool-info">
-        <h2>Template Designer</h2>
-        <p>Visual email templates with sections, smart fields, and one-click copy to AMD.</p>
+      <div>
+        <h2>Email Template Designer</h2>
+        <p>Build visual email templates for patient messaging, appointment reminders, and communications — with sections, smart fields, and one-click copy into AMD.</p>
+        </div>
+      <div class="tool-card-foot">
+        <span id="ed-foot-label">Open Email Template Designer</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <svg class="tool-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
 
-    <a class="tool-card" href="amd-note-builder.html">
-      <div class="tool-icon">
+    <a class="tool-card" href="amd-note-builder.html" id="card-nb">
+      <div class="tool-card-icon">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       </div>
-      <div class="tool-info">
-        <h2>Note Builder</h2>
-        <p>Clinical note templates for EHR documentation with smart fields and structured blocks.</p>
+      <div>
+        <h2>In-Line Narrative Template Designer</h2>
+        <p>Build structured clinical note templates for AMD's narrative template editor — with headings, tables, lists, and 186 AMD bookmarks that auto-fill from the patient chart.</p>
+        </div>
+      <div class="tool-card-foot">
+        <span id="nb-foot-label">Open In-Line Narrative Template Designer</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <svg class="tool-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
-
   </div>
+</main>
 
-  <div class="foot">
-    TMJ Sleep Solutions NW &nbsp;·&nbsp; AMD Template Tools
-  </div>
+<footer>TMJ Sleep Solutions NW &nbsp;·&nbsp; AMD Template Tools</footer>
 
-</div>
+<script>
+(function() {
+  const lastTool = localStorage.getItem('amt_last_tool');
+
+  // ── Resume cards ──────────────────────────────────────────────────────────
+  const sessions = [
+    { key: 'td_autosave', href: 'amd-email-designer.html', name: 'Email Template Designer',
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg>',
+      countKey: 'sections' },
+    { key: 'nb_autosave', href: 'amd-note-builder.html', name: 'In-Line Narrative Template Designer',
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+      countKey: 'sections' },
+  ];
+
+  const resumeItems = [];
+  sessions.forEach(s => {
+    try {
+      const raw = localStorage.getItem(s.key);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      const count = (d[s.countKey] || []).length;
+      if (!count) return;
+      const when = d.savedAt
+        ? new Date(d.savedAt).toLocaleDateString(undefined, {month:'short', day:'numeric'})
+          + ' at ' + new Date(d.savedAt).toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'})
+        : '';
+      const unit = s.name === 'In-Line Narrative Template Designer' ? 'block' : 'section';
+      resumeItems.push(`
+        <a class="resume-item" href="${s.href}">
+          <div class="resume-item-icon">${s.icon}</div>
+          <div>
+            <strong>${s.name}</strong>
+            <span>${count} ${unit}${count===1?'':'s'}${when?' · '+when:''}</span>
+          </div>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--text3);flex-shrink:0;margin-left:auto;"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>`);
+    } catch(e) {}
+  });
+
+  if (resumeItems.length) {
+    document.getElementById('resume-banner').classList.add('visible');
+    document.getElementById('resume-items').innerHTML = resumeItems.join('');
+  }
+
+  // ── Last used badge ────────────────────────────────────────────────────────
+  if (lastTool === 'ed') {
+    document.getElementById('card-ed').classList.add('last-used');
+    document.getElementById('ed-foot-label').innerHTML =
+      '<span class="last-badge">Last used</span> Continue in Email Template Designer';
+  } else if (lastTool === 'nb') {
+    document.getElementById('card-nb').classList.add('last-used');
+    document.getElementById('nb-foot-label').innerHTML =
+      '<span class="last-badge">Last used</span> Continue in In-Line Narrative Template Designer';
+  }
+})();
+</script>
 </body>
 </html>

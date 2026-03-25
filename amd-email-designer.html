@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AMD Email Template Designer</title>
+<title>AMD Email Email Template Designer</title>
 <style>
 /* ── RESET & BASE ── */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,12 +39,37 @@ body {
 /* ── HEADER ── */
 header {
   background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 0 20px; height: 52px;
+  padding: 0 16px; height: 48px;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   flex-shrink: 0; z-index: 10;
 }
 header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 .header-actions { display: flex; align-items: center; gap: 6px; }
+/* ── SHARED APP NAV ── */
+.app-nav {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 16px; height: 40px; flex-shrink: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.app-nav-left { display: flex; align-items: center; gap: 10px; }
+.app-nav-logo { display:flex; align-items:center; gap:7px; text-decoration:none; color:var(--text2); padding:4px 8px; border-radius:var(--radius-sm); transition:color 0.12s, background 0.12s; }
+.app-nav-logo:hover { color: var(--blue); background: var(--blue-lt); }
+.app-nav-logo svg { color: var(--blue); flex-shrink: 0; }
+.app-nav-sep { width: 1px; height: 16px; background: var(--border2); flex-shrink: 0; }
+.app-nav-tool { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--text); }
+.app-nav-tool svg { color: var(--blue); }
+.app-nav-switcher { display: flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 3px; }
+.app-nav-switch {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 500; color: var(--text2);
+  padding: 3px 10px; border-radius: 16px; cursor: pointer;
+  border: none; background: transparent; font-family: inherit;
+  transition: all 0.15s; text-decoration: none; white-space: nowrap;
+}
+.app-nav-switch:hover { color: var(--text); background: var(--surface); }
+.app-nav-switch.active { background: var(--surface); color: var(--blue); font-weight: 600; box-shadow: var(--shadow-sm); cursor: default; }
+.app-nav-switch.active svg { color: var(--blue); }
+
 .undo-redo { display: flex; gap: 2px; }
 
 /* Ghost button */
@@ -309,111 +334,89 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 #mf-trigger-hint { font-size: 10px; color: var(--text3); padding: 6px 12px; border-top: 1px solid var(--border); text-align: center; background: var(--surface2); }
 
 /* ── SPLASH ── */
-#splash { position: fixed; inset: 0; z-index: 50000; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 24px; }
-.splash-box { width: 100%; max-width: 760px; display: flex; flex-direction: column; gap: 32px; }
-.splash-head { text-align: center; }
-.splash-head h1 { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; margin-bottom: 6px; }
-.splash-head p { font-size: 13px; color: var(--text2); }
-.splash-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.splash-scratch { background: var(--surface); border: 1.5px solid var(--border2); border-radius: var(--radius-lg); padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 14px; cursor: pointer; transition: all 0.18s; text-align: center; }
-.splash-scratch:hover { border-color: var(--blue); background: var(--blue-lt); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.splash-scratch .sc-icon { font-size: 32px; }
-.splash-scratch h2 { font-size: 14px; font-weight: 600; color: var(--text); }
-.splash-scratch p { font-size: 12px; color: var(--text2); line-height: 1.55; }
-.splash-tpls { background: var(--surface); border: 1.5px solid var(--border2); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 8px; }
-.splash-tpls h2 { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 4px; }
-.tpl-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 11px 14px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 12px; }
-.tpl-card:hover { border-color: var(--blue); background: var(--blue-lt); }
-.tpl-dot { width: 32px; height: 32px; border-radius: var(--radius-sm); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 1px solid var(--border); }
-.tpl-info h3 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 1px; }
-.tpl-info p { font-size: 11px; color: var(--text2); line-height: 1.35; }
-
-/* ── ANIMATIONS ── */
-@keyframes undoShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-3px)} 40%{transform:translateX(3px)} 60%{transform:translateX(-2px)} 80%{transform:translateX(2px)} }
-.shake { animation: undoShake 0.3s ease; }
-
-/* ── PREVIEW MODAL ── */
-#preview-modal {
-  position: fixed; inset: 0; z-index: 60000;
-  background: rgba(0,0,0,0.6);
-  display: none; align-items: flex-start; justify-content: center;
-  padding: 0; overflow-y: auto;
-  animation: previewFadeIn 0.2s ease;
+/* ── SPLASH HUB ── */
+#splash {
+  position: fixed; inset: 0; z-index: 50000;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  overflow-y: auto;
 }
-@keyframes previewFadeIn { from { opacity:0; } to { opacity:1; } }
-#preview-modal.open { display: flex; }
-#preview-modal-inner {
-  width: 100%; min-height: 100vh;
-  display: flex; flex-direction: column; align-items: center;
-  padding: 0 20px 48px;
+.splash-wrap {
+  width: 100%; max-width: 520px; display: flex; flex-direction: column;
+  gap: 24px; padding: 40px 24px 40px;
+  margin: 0 auto; flex: 1; justify-content: center;
 }
-#preview-bar {
-  width: 100%; max-width: 700px;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 0 14px; gap: 12px; flex-shrink: 0;
-}
-.preview-badge {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 20px; padding: 5px 12px;
-  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.9);
-  letter-spacing: 0.3px;
-}
-.preview-badge svg { opacity: 0.8; }
-.preview-note {
-  font-size: 11px; color: rgba(255,255,255,0.5);
-  text-align: center; flex: 1;
-}
-.preview-close {
-  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.8); cursor: pointer;
-  padding: 6px 14px; border-radius: var(--radius-sm);
-  font-size: 12px; font-weight: 500; font-family: inherit;
-  display: flex; align-items: center; gap: 6px;
-  transition: background 0.12s;
-}
-.preview-close:hover { background: rgba(255,255,255,0.2); color: #fff; }
-#preview-card {
-  width: 100%; max-width: 660px;
-}
-
-/* ── SMART FIELD CHIPS (canvas preview only) ── */
-.sec-inner .mceNonEditable {
-  display: inline;
-  background: rgba(217, 119, 6, 0.08);
-  border-bottom: 2px solid var(--amber);
-  border-radius: 2px;
-  padding: 0 1px;
-  cursor: default;
-  user-select: none;
-  /* Inherits all text styling: color, font, size, weight from parent */
-}
-
-/* ── SMART FIELD LEGEND ── */
-.sf-legend {
-  display: flex; align-items: flex-start; gap: 8px;
-  background: var(--amber-lt); border: 1px solid #fde68a;
-  border-radius: var(--radius-sm); padding: 8px 10px;
-  font-size: 11px; color: var(--amber); line-height: 1.5;
-}
-.sf-legend svg { flex-shrink: 0; margin-top: 1px; }
-.splash-resume-card {
+.splash-brand { text-align: center; }
+.splash-brand-eye { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--blue); margin-bottom: 8px; }
+.splash-brand h1 { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; margin-bottom: 6px; }
+.splash-brand p { font-size: 13px; color: var(--text2); }
+/* Resume */
+.splash-resume {
   background: var(--surface); border: 1.5px solid var(--blue);
   border-radius: var(--radius-lg); padding: 14px 18px;
-  display: flex; align-items: center; gap: 14px;
-  cursor: pointer; transition: all 0.15s;
-  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  transition: all 0.15s;
 }
-.splash-resume-card:hover { background: var(--blue-lt); box-shadow: var(--shadow-md); }
+.splash-resume:hover { background: var(--blue-lt); box-shadow: var(--shadow-md); }
 .splash-resume-icon {
-  width: 40px; height: 40px; border-radius: var(--radius-md);
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
   background: var(--blue-lt); border: 1px solid var(--blue-mid);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--blue); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; color: var(--blue); flex-shrink: 0;
 }
-.splash-resume-info { flex: 1; }
-.splash-resume-info h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
-.splash-resume-info p { font-size: 11px; color: var(--text2); }
+.splash-resume-text { flex: 1; }
+.splash-resume-text strong { font-size: 13px; font-weight: 600; color: var(--text); display: block; margin-bottom: 1px; }
+.splash-resume-text span { font-size: 11px; color: var(--text2); }
+/* Tool cards */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.splash-start-btn {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: var(--radius-md); padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s;
+}
+.splash-start-btn:hover { border-color: var(--blue); background: var(--blue-lt); }
+.splash-start-icon {
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  background: var(--surface2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; color: var(--blue); flex-shrink: 0;
+}
+.splash-start-btn:hover .splash-start-icon { background: var(--blue-lt); border-color: var(--blue-mid); }
+.splash-start-text strong { font-size: 12px; font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
+.splash-start-text span { font-size: 11px; color: var(--text2); }
+/* Template list */
+.splash-tpl-list {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: var(--radius-lg); overflow: hidden;
+}
+.splash-tpl-header {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px;
+  color: var(--text3); padding: 12px 16px 8px; border-bottom: 1px solid var(--border);
+}
+.splash-tpl-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 11px 16px; cursor: pointer; transition: background 0.12s; border-bottom: 1px solid var(--border);
+}
+.splash-tpl-item:last-child { border-bottom: none; }
+.splash-tpl-item:hover { background: var(--blue-lt); }
+.splash-tpl-item:hover .tpl-arrow { color: var(--blue); }
+.splash-tpl-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.splash-tpl-desc { font-size: 11px; color: var(--text2); }
+.tpl-arrow { color: var(--text3); flex-shrink: 0; transition: color 0.12s; }
 
 /* ── MODIFIED INDICATOR ── */
 .modified-dot {
@@ -548,57 +551,86 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 
 <!-- SPLASH -->
 <div id="splash">
-  <div class="splash-box">
-    <div class="splash-head">
-      <h1>Template Designer</h1>
-      <p>Start from scratch or pick a pre-built template</p>
+<div class="app-nav" style="flex-shrink:0;">
+  <div class="app-nav-left">
+    <a class="app-nav-logo" href="index.html" title="Home">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </a>
+  </div>
+  <div class="app-nav-switcher">
+    <a class="app-nav-switch" href="amd-note-builder.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Narrative Designer</a>
+    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Email Designer</span>
+  </div>
+</div>
+  <div class="splash-wrap">
+    <div class="splash-brand">
+      <div class="splash-brand-eye">Center Suite Tools</div>
+      <h1>Email Template Designer</h1>
+      <p>Build visual email templates for AMD's messaging and patient communications</p>
     </div>
     <div id="splash-resume" style="display:none;">
-      <div class="splash-resume-card" onclick="resumeSession()">
+      <div class="splash-resume" onclick="resumeSession()">
         <div class="splash-resume-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><polyline points="12 7 12 12 15 15"/></svg>
         </div>
-        <div class="splash-resume-info">
-          <h3>Resume Last Session</h3>
-          <p id="splash-resume-meta">Continue where you left off</p>
+        <div class="splash-resume-text">
+          <strong>Resume Last Session</strong>
+          <span id="splash-resume-meta">Continue where you left off</span>
         </div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
     </div>
-    <div class="splash-choices">
-      <div class="splash-scratch" onclick="startScratch()">
-        <span class="sc-icon">✦</span>
-        <h2>Start from Scratch</h2>
-        <p>Blank canvas — build your email section by section exactly how you want it</p>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:16px;">
-        <div class="splash-tpls">
-          <h2>Pre-built Templates</h2>
-          <div class="tpl-card" onclick="startTemplate('telehealth')"><div class="tpl-info"><h3>Telehealth Reminder</h3><p>Video visit with portal button & cancellation notice</p></div></div>
-          <div class="tpl-card" onclick="startTemplate('hst')"><div class="tpl-info"><h3>HST Pickup Reminder</h3><p>Home sleep test device pickup instructions</p></div></div>
-          <div class="tpl-card" onclick="startTemplate('osd')"><div class="tpl-info"><h3>OSD Fitting Appointment</h3><p>Oral sleep device fitting reminder & prep tips</p></div></div>
-          <div class="tpl-card" onclick="startTemplate('followup')"><div class="tpl-info"><h3>General Follow-Up</h3><p>Flexible follow-up for any appointment type</p></div></div>
+    <div class="splash-start">
+      <div class="splash-start-btn" onclick="startScratch()">
+        <div class="splash-start-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </div>
-        <div class="splash-scratch" onclick="window.open('amd-note-builder.html','_blank')" style="padding:18px 24px;flex-direction:row;justify-content:space-between;gap:16px;text-align:left;">
-          <div style="display:flex;flex-direction:column;gap:4px;">
-            <h2 style="font-size:13px;">Note Builder</h2>
-            <p style="font-size:11px;">Clinical note templates for EHR documentation</p>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+        <div class="splash-start-text">
+          <strong>Start from Scratch</strong>
+          <span>Blank canvas, build section by section</span>
         </div>
       </div>
+      <div class="splash-start-btn" onclick="toggleTplList()">
+        <div class="splash-start-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </div>
+        <div class="splash-start-text">
+          <strong>Use a Template</strong>
+          <span>4 pre-built email templates</span>
+        </div>
+      </div>
+    </div>
+    <div class="splash-tpl-list" id="splash-tpl-list" style="display:none;">
+      <div class="splash-tpl-header">Pre-built Templates</div>
+      <div class="splash-tpl-item" onclick="startTemplate('telehealth')"><div><div class="splash-tpl-name">Telehealth Reminder</div><div class="splash-tpl-desc">Video visit with portal button &amp; cancellation notice</div></div><svg class="tpl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="splash-tpl-item" onclick="startTemplate('hst')"><div><div class="splash-tpl-name">HST Pickup Reminder</div><div class="splash-tpl-desc">Home sleep test device pickup instructions</div></div><svg class="tpl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="splash-tpl-item" onclick="startTemplate('osd')"><div><div class="splash-tpl-name">OSD Fitting Appointment</div><div class="splash-tpl-desc">Oral sleep device fitting reminder &amp; prep tips</div></div><svg class="tpl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="splash-tpl-item" onclick="startTemplate('followup')"><div><div class="splash-tpl-name">General Follow-Up</div><div class="splash-tpl-desc">Flexible follow-up for any appointment type</div></div><svg class="tpl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
     </div>
   </div>
 </div>
 
 <!-- HEADER -->
+<div class="app-nav" style="flex-shrink:0;">
+  <div class="app-nav-left">
+    <a class="app-nav-logo" href="index.html" title="Home">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </a>
+  </div>
+  <div class="app-nav-switcher">
+    <a class="app-nav-switch" href="amd-note-builder.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Narrative Designer</a>
+    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Email Designer</span>
+  </div>
+</div>
+  <div class="app-nav-switcher">
+    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Email Template Designer</span>
+    <a class="app-nav-switch" href="amd-note-builder.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Note Builder</a>
+  </div>
+</div>
 <header>
   <h1>
-    <button class="ghost-btn" onclick="returnToSplash()" title="Home" style="padding:0 8px;">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    </button>
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
-    Template Designer
+    Email Template Designer
     <span class="modified-dot" id="modified-dot" title="Unsaved changes"></span>
   </h1>
   <div class="header-actions">
@@ -937,6 +969,7 @@ function dismissSplash() {
 }
 
 function returnToSplash() {
+  window.location.href = 'index.html'; return;
   saveActiveEditable();
   closePanel();
   selectedId = null;
@@ -2675,6 +2708,7 @@ function applyFindReplace() {
   panel.style.top  = '76px';
   renderCanvas();
   renderSnippets();
+  localStorage.setItem('amt_last_tool','ed');
 
   // Check for saved session and show resume card if found
   const saved = loadSavedSession();
