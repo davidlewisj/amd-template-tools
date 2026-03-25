@@ -1544,52 +1544,67 @@ function applyFindReplace() {
   if (msg) msg.textContent = count > 0 ? `Replaced ${count} instance${count===1?'':'s'}` : 'No instances found';
 }
 
-function mceStyle(s) { return `style="${s}" data-mce-style="${s}"`; }
+// ── TinyMCE OUTPUT ────────────────────────────────────────────────────────────
+function sanitizeForMCE(html) {
+  if (!html) return '';
+  // Strip contenteditable="true" from editable divs
+  let out = html.replace(/ contenteditable="true"/g, '');
+  // Normalize mceNonEditable spans to exact AMD format
+  out = out.replace(
+    /<span[^>]*class="mceNonEditable"[^>]*>&lt;&lt;([^<]+?)&gt;&gt;<\/span>/g,
+    (_, token) => `<span class="mceNonEditable" style="color: red;" contenteditable="false">&lt;&lt;${token}&gt;&gt;</span>`
+  );
+  // Convert any raw <<TOKEN>> that slipped through
+  out = out.replace(/<<([^>]+?)>>/g,
+    (_, token) => `<span class="mceNonEditable" style="color: red;" contenteditable="false">&lt;&lt;${token}&gt;&gt;</span>`
+  );
+  return out;
+}
 
 function buildNoteHTML() {
   saveActiveEditable();
-  const f = G.font, fs = G.fontSize;
   let html = '';
   sections.filter(s => !s.hidden).forEach(sec => {
-    switch(sec.type) {
-      case 'heading': {
-        const hS = 'font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#6b6560;padding-bottom:4px;border-bottom:1px solid #e2ddd8;margin:20px 0 8px;';
-        html += `<h3 ${mceStyle(hS)}>${sanitizeForMCE(sec.text)}</h3>`;
+    switch (sec.type) {
+
+      case 'heading':
+        // AMD uses plain <h3> — no attributes, no styles
+        html += `<h3>${sanitizeForMCE(sec.text)}</h3>`;
         break;
-      }
-      case 'paragraph': {
-        const pS = `font-family:${f};font-size:${fs}px;line-height:1.75;color:#1a1714;margin:0 0 8px;`;
-        html += `<p ${mceStyle(pS)}>${sanitizeForMCE(sec.html)}</p>`;
+
+      case 'paragraph':
+        // Plain <p> — no attributes
+        html += `<p>${sanitizeForMCE(sec.html)}</p>`;
         break;
-      }
+
       case 'list': {
+        // Plain <ul>/<ol> and <li> — no attributes on anything
         const tag = sec.listType || 'ul';
-        const lS = 'padding-left:22px;margin:0 0 8px;';
-        const liS = `font-family:${f};font-size:${fs}px;line-height:1.75;color:#1a1714;`;
-        const items = (sec.items||[]).map(item =>
-          `<li ${mceStyle(liS)}>${sanitizeForMCE(item)}</li>`
-        ).join('');
-        html += `<${tag} ${mceStyle(lS)}>${items}</${tag}>`;
+        const items = (sec.items || [])
+          .map(item => `<li>${sanitizeForMCE(item)}</li>`)
+          .join('');
+        html += `<${tag}>${items}</${tag}>`;
         break;
       }
+
       case 'table': {
-        const tableS = 'width:100%;border-collapse:collapse;font-size:13px;margin:0 0 8px;';
-        const rows = (sec.rows||[]).map((row, r) =>
-          `<tr>${row.map((cell, c) => {
-            const tdS = `padding:6px 10px;border:1px solid #e2ddd8;vertical-align:top;${c===0?'font-weight:600;color:#6b6560;width:38%;background:#f2f0ed;':''}`;
-            return `<td ${mceStyle(tdS)}>${sanitizeForMCE(cell)}</td>`;
-          }).join('')}</tr>`
+        // AMD native table: only cellspacing="0" cellpadding="0" on <table>
+        // <tbody>, <tr>, <td> all have zero attributes
+        const rows = (sec.rows || []).map(row =>
+          `<tr>${row.map(cell =>
+            `<td>${sanitizeForMCE(cell)}</td>`
+          ).join('')}</tr>`
         ).join('');
-        html += `<table class="mce-item-table" cellspacing="0" cellpadding="0" ${mceStyle(tableS)}><tbody>${rows}</tbody></table>`;
+        html += `<table cellspacing="0" cellpadding="0"><tbody>${rows}</tbody></table>`;
         break;
       }
-      case 'divider': {
-        const hrS = 'border:none;border-top:1px solid #e2ddd8;margin:12px 0;';
-        html += `<hr ${mceStyle(hrS)}>`;
+
+      case 'divider':
+        html += `<hr>`;
         break;
-      }
+
       case 'spacer':
-        html += `<div ${mceStyle(`height:${sec.height||20}px;`)}>&nbsp;</div>`;
+        html += `<p>&nbsp;</p>`;
         break;
     }
   });
