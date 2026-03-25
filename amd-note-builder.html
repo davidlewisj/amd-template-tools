@@ -1544,16 +1544,7 @@ function applyFindReplace() {
   if (msg) msg.textContent = count > 0 ? `Replaced ${count} instance${count===1?'':'s'}` : 'No instances found';
 }
 
-// ── TinyMCE OUTPUT ────────────────────────────────────────────────────────────
-function sanitizeForMCE(html) {
-  if (!html) return '';
-  let out = html.replace(/ contenteditable="true"/g,'');
-  out = out.replace(/<span[^>]*class="mceNonEditable"[^>]*>&lt;&lt;([^<]+?)&gt;&gt;<\/span>/g,
-    (_, token) => `<span class="mceNonEditable" style="color:red;" data-mce-style="color:red;" contenteditable="false">&lt;&lt;${token}&gt;&gt;</span>`);
-  out = out.replace(/<<([^>]+?)>>/g,
-    (_, token) => `<span class="mceNonEditable" style="color:red;" data-mce-style="color:red;" contenteditable="false">&lt;&lt;${token}&gt;&gt;</span>`);
-  return out;
-}
+function mceStyle(s) { return `style="${s}" data-mce-style="${s}"`; }
 
 function buildNoteHTML() {
   saveActiveEditable();
@@ -1561,32 +1552,44 @@ function buildNoteHTML() {
   let html = '';
   sections.filter(s => !s.hidden).forEach(sec => {
     switch(sec.type) {
-      case 'heading':
-        html += `<h3 style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#6b6560;padding-bottom:4px;border-bottom:1px solid #e2ddd8;margin:20px 0 8px;">${sanitizeForMCE(sec.text)}</h3>`;
+      case 'heading': {
+        const hS = 'font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#6b6560;padding-bottom:4px;border-bottom:1px solid #e2ddd8;margin:20px 0 8px;';
+        html += `<h3 ${mceStyle(hS)}>${sanitizeForMCE(sec.text)}</h3>`;
         break;
-      case 'paragraph':
-        html += `<p style="font-family:${f};font-size:${fs}px;line-height:1.75;color:#1a1714;margin:0 0 8px;">${sanitizeForMCE(sec.html)}</p>`;
+      }
+      case 'paragraph': {
+        const pS = `font-family:${f};font-size:${fs}px;line-height:1.75;color:#1a1714;margin:0 0 8px;`;
+        html += `<p ${mceStyle(pS)}>${sanitizeForMCE(sec.html)}</p>`;
         break;
+      }
       case 'list': {
         const tag = sec.listType || 'ul';
-        const items = (sec.items||[]).map(item => `<li style="font-family:${f};font-size:${fs}px;line-height:1.75;color:#1a1714;">${sanitizeForMCE(item)}</li>`).join('');
-        html += `<${tag} style="padding-left:22px;margin:0 0 8px;">${items}</${tag}>`;
+        const lS = 'padding-left:22px;margin:0 0 8px;';
+        const liS = `font-family:${f};font-size:${fs}px;line-height:1.75;color:#1a1714;`;
+        const items = (sec.items||[]).map(item =>
+          `<li ${mceStyle(liS)}>${sanitizeForMCE(item)}</li>`
+        ).join('');
+        html += `<${tag} ${mceStyle(lS)}>${items}</${tag}>`;
         break;
       }
       case 'table': {
+        const tableS = 'width:100%;border-collapse:collapse;font-size:13px;margin:0 0 8px;';
         const rows = (sec.rows||[]).map((row, r) =>
-          `<tr>${row.map((cell, c) =>
-            `<td style="padding:6px 10px;border:1px solid #e2ddd8;vertical-align:top;${c===0?'font-weight:600;color:#6b6560;width:38%;background:#f2f0ed;':''}">${sanitizeForMCE(cell)}</td>`
-          ).join('')}</tr>`
+          `<tr>${row.map((cell, c) => {
+            const tdS = `padding:6px 10px;border:1px solid #e2ddd8;vertical-align:top;${c===0?'font-weight:600;color:#6b6560;width:38%;background:#f2f0ed;':''}`;
+            return `<td ${mceStyle(tdS)}>${sanitizeForMCE(cell)}</td>`;
+          }).join('')}</tr>`
         ).join('');
-        html += `<table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;font-size:13px;margin:0 0 8px;">${rows}</table>`;
+        html += `<table class="mce-item-table" cellspacing="0" cellpadding="0" ${mceStyle(tableS)}><tbody>${rows}</tbody></table>`;
         break;
       }
-      case 'divider':
-        html += `<hr style="border:none;border-top:1px solid #e2ddd8;margin:12px 0;">`;
+      case 'divider': {
+        const hrS = 'border:none;border-top:1px solid #e2ddd8;margin:12px 0;';
+        html += `<hr ${mceStyle(hrS)}>`;
         break;
+      }
       case 'spacer':
-        html += `<div style="height:${sec.height||20}px;">&nbsp;</div>`;
+        html += `<div ${mceStyle(`height:${sec.height||20}px;`)}>&nbsp;</div>`;
         break;
     }
   });
