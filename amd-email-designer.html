@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -48,26 +47,27 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 /* ── SHARED APP NAV ── */
 .app-nav {
   background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 0 16px; height: 40px; flex-shrink: 0; z-index: 20;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 0 24px; height: 52px; flex-shrink: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
-.app-nav-left { display: flex; align-items: center; gap: 10px; }
-.app-nav-logo { display:flex; align-items:center; gap:7px; text-decoration:none; color:var(--text2); padding:4px 8px; border-radius:var(--radius-sm); transition:color 0.12s, background 0.12s; }
+.app-nav-left { display: flex; align-items: center; gap: 12px; }
+.app-nav-logo { display:flex; align-items:center; gap:8px; text-decoration:none; color:var(--text2); padding:7px 12px; border-radius:var(--radius-sm); transition:color 0.12s, background 0.12s; font-size:13px; font-weight:600; }
 .app-nav-logo:hover { color: var(--blue); background: var(--blue-lt); }
-.app-nav-logo svg { color: var(--blue); flex-shrink: 0; }
-.app-nav-sep { width: 1px; height: 16px; background: var(--border2); flex-shrink: 0; }
-.app-nav-tool { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--text); }
+.app-nav-logo svg { color: var(--blue); flex-shrink: 0; width: 17px; height: 17px; }
+.app-nav-sep { width: 1px; height: 20px; background: var(--border2); flex-shrink: 0; }
+.app-nav-tool { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); }
 .app-nav-tool svg { color: var(--blue); }
-.app-nav-switcher { display: flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 3px; }
+.app-nav-switcher { display: flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 26px; padding: 4px; }
 .app-nav-switch {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 11px; font-weight: 500; color: var(--text2);
-  padding: 3px 10px; border-radius: 16px; cursor: pointer;
-  border: none; background: transparent; font-family: inherit;
+  display: flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 500; color: var(--text2);
+  padding: 7px 18px; border-radius: 20px; cursor: pointer;
+  border: 1px solid transparent; background: transparent; font-family: inherit;
   transition: all 0.15s; text-decoration: none; white-space: nowrap;
 }
-.app-nav-switch:hover { color: var(--text); background: var(--surface); }
-.app-nav-switch.active { background: var(--surface); color: var(--blue); font-weight: 600; box-shadow: var(--shadow-sm); cursor: default; }
+.app-nav-switch svg { width: 15px; height: 15px; flex-shrink: 0; }
+.app-nav-switch:hover { color: var(--text); background: var(--surface); border-color: var(--border); }
+.app-nav-switch.active { background: var(--surface); color: var(--blue); font-weight: 600; box-shadow: var(--shadow-sm); cursor: default; border-color: var(--border); }
 .app-nav-switch.active svg { color: var(--blue); }
 
 .undo-redo { display: flex; gap: 2px; }
@@ -545,6 +545,84 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 .find-replace .apply-btn { background: var(--blue); border: none; color: #fff; padding: 7px 12px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.12s; }
 .find-replace .apply-btn:hover { background: #2563eb; }
 .find-replace .result-msg { font-size: 11px; color: var(--text2); text-align: center; padding: 4px 0; }
+
+/* ── PREVIEW MODAL ── */
+#preview-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.7);
+}
+#preview-modal.open { display: block; }
+#preview-modal-inner {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 48px;
+}
+#preview-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: rgba(15,20,30,0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  box-sizing: border-box;
+}
+.preview-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #93c5fd;
+  background: rgba(59,130,246,0.15);
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 20px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.preview-note {
+  flex: 1;
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+}
+.preview-close {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-sm);
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+.preview-close:hover { background: rgba(255,255,255,0.15); color: #fff; }
+#preview-card {
+  width: 100%;
+  max-width: 660px;
+  margin-top: 32px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
 </style>
 </head>
 <body>
@@ -555,11 +633,12 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
   <div class="app-nav-left">
     <a class="app-nav-logo" href="index.html" title="Home">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
     </a>
   </div>
   <div class="app-nav-switcher">
+    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Template Designer</span>
     <a class="app-nav-switch" href="amd-note-builder.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Narrative Designer</a>
-    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Email Designer</span>
   </div>
 </div>
   <div class="splash-wrap">
@@ -615,16 +694,12 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
   <div class="app-nav-left">
     <a class="app-nav-logo" href="index.html" title="Home">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
     </a>
   </div>
   <div class="app-nav-switcher">
+    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Template Designer</span>
     <a class="app-nav-switch" href="amd-note-builder.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Narrative Designer</a>
-    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Email Designer</span>
-  </div>
-</div>
-  <div class="app-nav-switcher">
-    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Email Template Designer</span>
-    <a class="app-nav-switch" href="amd-note-builder.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Note Builder</a>
   </div>
 </div>
 <header>
@@ -900,9 +975,11 @@ function clone(o) { return JSON.parse(JSON.stringify(o)); }
 // ── TEMPLATES ─────────────────────────────────────────────────────────────────
 const SF = (token) => `<span class="mceNonEditable" contenteditable="false">&lt;&lt;${token}&gt;&gt;</span>`;
 
+const TMJ_IMG = 'https://tmjsleepsolutionsnw.com/wp-content/uploads/2023/08/Kushner-TMJ_SleepNW.png';
 const TPLS = {
   telehealth: () => [
-    { ...clone(D.header),    id:uid(), bg:'#2563eb',
+    { ...clone(D.image),     id:uid(), bg:'#0f2044', imgSrc:TMJ_IMG, imgAlt:'TMJ Sleep Solutions NW', imgWidth:100, align:'center' },
+    { ...clone(D.header),    id:uid(), bg:'#0f2044', accentColor:'#93c5fd',
       eyebrow:'Appointment Reminder',
       greeting:`Hi, ${SF('PT_FIRSTNAME')}!`,
       subtitle:'Your Telehealth appointment is coming up!' },
@@ -910,14 +987,15 @@ const TPLS = {
       html:`This is a reminder of your upcoming Telehealth appointment with ${SF('PR_NAME')} on ${SF('APPT_DATETIME')}.` },
     { ...clone(D.paragraph), id:uid(),
       html:'Your appointment link will be sent <strong>1 day prior</strong> to your visit. You may also use the patient portal to review upcoming appointments, send us a message, and complete forms.' },
-    { ...clone(D.button),    id:uid(), btnLabel:'Open Patient Portal', btnUrl:'https://patientportal.advancedmd.com/157297' },
+    { ...clone(D.button),    id:uid(), btnBg:'#1d4ed8', btnLabel:'Open Patient Portal', btnUrl:'https://patientportal.advancedmd.com/157297' },
     { ...clone(D.notice),    id:uid(),
       html:'Appointments canceled within 48 hours are subject to a $75 cancellation fee.' },
-    { ...clone(D.footer),    id:uid(), bg:'#1e3a8a',
+    { ...clone(D.footer),    id:uid(), bg:'#0f2044', accentColor:'#93c5fd',
       signoffHtml:'Thank you,', nameHtml:SF('FAC_NAME'), phoneHtml:SF('FAC_PHONE') }
   ],
   hst: () => [
-    { ...clone(D.header),    id:uid(), bg:'#166534', accentColor:'#bbf7d0',
+    { ...clone(D.image),     id:uid(), bg:'#0f2044', imgSrc:TMJ_IMG, imgAlt:'TMJ Sleep Solutions NW', imgWidth:100, align:'center' },
+    { ...clone(D.header),    id:uid(), bg:'#0f2044', accentColor:'#93c5fd',
       eyebrow:'Home Sleep Test',
       greeting:`Hi, ${SF('PT_FIRSTNAME')}!`,
       subtitle:'Your sleep test device is ready for pickup' },
@@ -925,38 +1003,40 @@ const TPLS = {
       html:`Your Home Sleep Test has been scheduled for ${SF('APPT_DATETIME')}. Please pick up your device at our ${SF('FAC_NAME')} location.` },
     { ...clone(D.paragraph), id:uid(),
       html:'When you arrive, our team will walk you through how to use the device and answer any questions.' },
-    { ...clone(D.notice),    id:uid(), bg:'#f0fdf4', textColor:'#14532d', borderColor:'#86efac',
+    { ...clone(D.notice),    id:uid(),
       html:'Please return the device within 3 days of your test night. A $150 replacement fee applies to lost or damaged devices.' },
-    { ...clone(D.button),    id:uid(), btnBg:'#16a34a', btnLabel:'View Appointment Details', btnUrl:'https://patientportal.advancedmd.com/157297' },
-    { ...clone(D.footer),    id:uid(), bg:'#14532d', accentColor:'#bbf7d0',
+    { ...clone(D.button),    id:uid(), btnBg:'#1d4ed8', btnLabel:'View Appointment Details', btnUrl:'https://patientportal.advancedmd.com/157297' },
+    { ...clone(D.footer),    id:uid(), bg:'#0f2044', accentColor:'#93c5fd',
       signoffHtml:'Thank you,', nameHtml:SF('FAC_NAME'), phoneHtml:SF('FAC_PHONE') }
   ],
   osd: () => [
-    { ...clone(D.header),    id:uid(), bg:'#9a3412', accentColor:'#fed7aa',
+    { ...clone(D.image),     id:uid(), bg:'#0f2044', imgSrc:TMJ_IMG, imgAlt:'TMJ Sleep Solutions NW', imgWidth:100, align:'center' },
+    { ...clone(D.header),    id:uid(), bg:'#0f2044', accentColor:'#93c5fd',
       eyebrow:'Device Fitting',
       greeting:`Hi, ${SF('PT_FIRSTNAME')}!`,
       subtitle:'Your oral sleep device fitting is scheduled' },
     { ...clone(D.paragraph), id:uid(),
       html:`You have an oral sleep device fitting appointment with ${SF('PR_NAME')} on ${SF('APPT_DATETIME')} at our ${SF('FAC_NAME')} location.` },
-    { ...clone(D.columns),   id:uid(), bg:'#fff7ed', textColor:'#7c2d12',
-      cols:[{id:uid(),bg:'#ffedd5',html:'🕐 Plan for 45–60 minutes for your fitting.'},{id:uid(),bg:'#ffedd5',html:'🦷 Brush and floss before your visit.'}] },
-    { ...clone(D.button),    id:uid(), btnBg:'#ea580c', btnLabel:'Confirm My Appointment', btnUrl:'https://patientportal.advancedmd.com/157297' },
-    { ...clone(D.notice),    id:uid(), bg:'#fff7ed', textColor:'#7c2d12', borderColor:'#fdba74',
+    { ...clone(D.columns),   id:uid(), bg:'#eff6ff', textColor:'#1e3a8a',
+      cols:[{id:uid(),bg:'#dbeafe',html:'🕐 Plan for 45–60 minutes for your fitting.'},{id:uid(),bg:'#dbeafe',html:'🦷 Brush and floss before your visit.'}] },
+    { ...clone(D.button),    id:uid(), btnBg:'#1d4ed8', btnLabel:'Confirm My Appointment', btnUrl:'https://patientportal.advancedmd.com/157297' },
+    { ...clone(D.notice),    id:uid(),
       html:'Appointments canceled within 48 hours are subject to a $75 cancellation fee.' },
-    { ...clone(D.footer),    id:uid(), bg:'#7c2d12', accentColor:'#fed7aa',
+    { ...clone(D.footer),    id:uid(), bg:'#0f2044', accentColor:'#93c5fd',
       signoffHtml:'Thank you,', nameHtml:SF('FAC_NAME'), phoneHtml:SF('FAC_PHONE') }
   ],
   followup: () => [
-    { ...clone(D.header),    id:uid(), bg:'#4c1d95', accentColor:'#ddd6fe',
+    { ...clone(D.image),     id:uid(), bg:'#0f2044', imgSrc:TMJ_IMG, imgAlt:'TMJ Sleep Solutions NW', imgWidth:100, align:'center' },
+    { ...clone(D.header),    id:uid(), bg:'#0f2044', accentColor:'#93c5fd',
       eyebrow:'Follow-Up Appointment',
       greeting:`Hi, ${SF('PT_FIRSTNAME')}!`,
       subtitle:'We look forward to seeing you' },
     { ...clone(D.paragraph), id:uid(),
       html:`This is a reminder of your follow-up appointment with ${SF('PR_NAME')} on ${SF('APPT_DATETIME')} at ${SF('FAC_NAME')}.` },
-    { ...clone(D.button),    id:uid(), btnBg:'#7c3aed', btnLabel:'Message Us', btnUrl:'https://patientportal.advancedmd.com/157297' },
+    { ...clone(D.button),    id:uid(), btnBg:'#1d4ed8', btnLabel:'Message Us', btnUrl:'https://patientportal.advancedmd.com/157297' },
     { ...clone(D.notice),    id:uid(),
       html:'Appointments canceled within 48 hours are subject to a $75 cancellation fee.' },
-    { ...clone(D.footer),    id:uid(), bg:'#3b0764', accentColor:'#ddd6fe',
+    { ...clone(D.footer),    id:uid(), bg:'#0f2044', accentColor:'#93c5fd',
       signoffHtml:'Thank you,', nameHtml:SF('FAC_NAME'), phoneHtml:SF('FAC_PHONE') }
   ]
 };
@@ -996,6 +1076,22 @@ function returnToSplash() {
 }
 function startScratch()   { sections = []; selectedId = null; pushHist(); renderCanvas(); dismissSplash(); setModified(false); }
 function startTemplate(k) { sections = TPLS[k](); selectedId = null; pushHist(); renderCanvas(); dismissSplash(); setModified(false); }
+function toggleTplList()  {
+  const el = document.getElementById('splash-tpl-list');
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+function quickAddLogo(id) {
+  const s = getSec(id); if (!s) return;
+  s.imgSrc = TMJ_IMG;
+  s.imgAlt = 'TMJ Sleep Solutions NW';
+  renderCanvas(); selectSec(id);
+  clearTimeout(histTimer); histTimer = setTimeout(pushHist, 600);
+}
+function openImgUrlPanel(id) {
+  selectSec(id);
+  fpTab('content');
+}
 
 // ── AUTOSAVE ──────────────────────────────────────────────────────────────────
 const SAVE_KEY = 'td_autosave';
@@ -1208,9 +1304,17 @@ function delColumn(secId, colId) {
 
 // ── PROP CHANGE ───────────────────────────────────────────────────────────────
 let histTimer = null;
+let renderTimer = null;
+const TEXT_PROPS = new Set(['imgSrc','imgAlt','linkUrl','btnUrl','btnLabel','text','html','eyebrow','greeting','subtitle','signoffHtml','nameHtml','phoneHtml','imgWidth','thickness','padding','height']);
 window.propChange = function(id, key, val) {
   const s = getSec(id); if (!s) return;
-  s[key] = val; renderCanvas(); selectSec(id);
+  s[key] = val;
+  if (TEXT_PROPS.has(key)) {
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(() => { renderCanvas(); selectSec(id); }, 800);
+  } else {
+    renderCanvas(); selectSec(id);
+  }
   clearTimeout(histTimer); histTimer = setTimeout(pushHist, 600);
 };
 window.colPropChange = function(secId, colId, key, val) {
@@ -1368,16 +1472,24 @@ function renderCanvas() {
   }
 
   // Apply zoom — scale the card but adjust the wrapper height so add-strip stays below
+  syncCanvasHeight();
+  // Re-sync after any images in the card finish loading (they load async)
+  const cardEl2 = document.getElementById('canvas-card');
+  if (cardEl2) {
+    cardEl2.querySelectorAll('img').forEach(img => {
+      if (!img.complete) img.addEventListener('load', syncCanvasHeight, { once: true });
+    });
+  }
+}
+
+function syncCanvasHeight() {
   const cardEl = document.getElementById('canvas-card');
   const canvasEl = document.getElementById('email-canvas');
-  if (cardEl) {
-    const scale = zoomLevel / 100;
-    cardEl.style.transform = `scale(${scale})`;
-    cardEl.style.transformOrigin = 'top center';
-    // Reserve the correct layout height so content below isn't covered
-    const naturalHeight = cardEl.scrollHeight;
-    canvasEl.style.height = Math.round(naturalHeight * scale) + 'px';
-  }
+  if (!cardEl || !canvasEl) return;
+  const scale = zoomLevel / 100;
+  cardEl.style.transform = `scale(${scale})`;
+  cardEl.style.transformOrigin = 'top center';
+  canvasEl.style.height = Math.round(cardEl.scrollHeight * scale) + 'px';
 }
 
 // ── SECTION HTML ──────────────────────────────────────────────────────────────
@@ -1455,20 +1567,31 @@ function buildSecDOM(sec) {
 
     case 'image': {
       const align = sec.align || 'center';
-      const tableAlign = align === 'left' ? 'left' : align === 'right' ? 'right' : 'center';
       if (!sec.imgSrc) {
+        const btnBase = `font-size:11px;font-weight:600;border-radius:var(--radius-sm);padding:7px 14px;cursor:pointer;border:none;font-family:${f};display:inline-flex;align-items:center;gap:5px;transition:opacity 0.12s;`;
         return `<div style="background:${sec.bg};padding:${p}px;text-align:center;">
-          <div style="border:2px dashed var(--border2);border-radius:var(--radius-md);padding:32px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="border:2px dashed var(--border2);border-radius:var(--radius-md);padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:14px;">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span style="font-size:12px;color:var(--text3);font-family:${f};">Add an image URL in the Content tab</span>
+            <span style="font-size:12px;color:var(--text3);font-family:${f};">No image added yet</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+              <button onclick="event.stopPropagation();quickAddLogo('${sec.id}')" style="${btnBase}background:var(--blue);color:#fff;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 13 9 20 9"/><path d="M20 14v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/></svg>
+                Quick Add Company Logo
+              </button>
+              <button onclick="event.stopPropagation();openImgUrlPanel('${sec.id}')" style="${btnBase}background:var(--surface);color:var(--text);border:1px solid var(--border);" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='var(--surface)'">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                Add Image URL
+              </button>
+            </div>
           </div>
         </div>`;
       }
-      const imgStyle = `display:block;width:${sec.imgWidth||100}%;max-width:100%;height:auto;border:0;`;
+      const alignMargin = align === 'left' ? '0 auto 0 0' : align === 'right' ? '0 0 0 auto' : '0 auto';
+      const imgStyle = `display:block;width:${sec.imgWidth||100}%;max-width:100%;height:auto;border:0;margin:${alignMargin};`;
       const img = `<img src="${sec.imgSrc}" alt="${sec.imgAlt||''}" style="${imgStyle}" />`;
       const content = sec.linkUrl
-        ? `<a href="${sec.linkUrl}" style="display:block;text-align:${align};">${img}</a>`
-        : `<div style="text-align:${align};">${img}</div>`;
+        ? `<a href="${sec.linkUrl}" style="display:block;">${img}</a>`
+        : `<div>${img}</div>`;
       return `<div style="background:${sec.bg};padding:${p}px;">${content}</div>`;
     }
     default: return '';
@@ -2279,9 +2402,11 @@ function buildRow(sec) {
     }
     case 'image': {
       if (!sec.imgSrc) return '';
-      const tdS = `background-color:${sec.bg};padding:${p}px;text-align:${sec.align||'center'};`;
+      const tdS = `background-color:${sec.bg};padding:${p}px;`;
       const w = sec.imgWidth || 100;
-      const imgS = `display:block;width:${w}%;max-width:100%;height:auto;border:0;margin:0 auto;`;
+      const _a = sec.align || 'center';
+      const _am = _a === 'left' ? '0 auto 0 0' : _a === 'right' ? '0 0 0 auto' : '0 auto';
+      const imgS = `display:block;width:${w}%;max-width:100%;height:auto;border:0;margin:${_am};`;
       const img = `<img src="${sec.imgSrc}" alt="${sec.imgAlt||''}" width="${w}%" ${mceS(imgS)} />`;
       const inner = sec.linkUrl
         ? `<a href="${sec.linkUrl}" data-mce-href="${sec.linkUrl}" style="display:block;">${img}</a>`
@@ -2605,14 +2730,7 @@ function toggleDarkPreview() {
 function setZoom(val) {
   zoomLevel = Math.min(150, Math.max(50, val));
   document.getElementById('zoom-label').textContent = zoomLevel + '%';
-  const cardEl = document.getElementById('canvas-card');
-  const canvasEl = document.getElementById('email-canvas');
-  if (cardEl) {
-    const scale = zoomLevel / 100;
-    cardEl.style.transform = `scale(${scale})`;
-    cardEl.style.transformOrigin = 'top center';
-    canvasEl.style.height = Math.round(cardEl.scrollHeight * scale) + 'px';
-  }
+  syncCanvasHeight();
 }
 
 // ── SNIPPETS ──────────────────────────────────────────────────────────────────

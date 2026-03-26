@@ -48,26 +48,27 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 /* ── SHARED APP NAV ── */
 .app-nav {
   background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 0 16px; height: 40px; flex-shrink: 0; z-index: 20;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 0 24px; height: 52px; flex-shrink: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
-.app-nav-left { display: flex; align-items: center; gap: 10px; }
-.app-nav-logo { display:flex; align-items:center; gap:7px; text-decoration:none; color:var(--text2); padding:4px 8px; border-radius:var(--radius-sm); transition:color 0.12s, background 0.12s; }
+.app-nav-left { display: flex; align-items: center; gap: 12px; }
+.app-nav-logo { display:flex; align-items:center; gap:8px; text-decoration:none; color:var(--text2); padding:7px 12px; border-radius:var(--radius-sm); transition:color 0.12s, background 0.12s; font-size:13px; font-weight:600; }
 .app-nav-logo:hover { color: var(--blue); background: var(--blue-lt); }
-.app-nav-logo svg { color: var(--blue); flex-shrink: 0; }
-.app-nav-sep { width: 1px; height: 16px; background: var(--border2); flex-shrink: 0; }
-.app-nav-tool { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--text); }
+.app-nav-logo svg { color: var(--blue); flex-shrink: 0; width: 17px; height: 17px; }
+.app-nav-sep { width: 1px; height: 20px; background: var(--border2); flex-shrink: 0; }
+.app-nav-tool { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); }
 .app-nav-tool svg { color: var(--blue); }
-.app-nav-switcher { display: flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 3px; }
+.app-nav-switcher { display: flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 26px; padding: 4px; }
 .app-nav-switch {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 11px; font-weight: 500; color: var(--text2);
-  padding: 3px 10px; border-radius: 16px; cursor: pointer;
-  border: none; background: transparent; font-family: inherit;
+  display: flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 500; color: var(--text2);
+  padding: 7px 18px; border-radius: 20px; cursor: pointer;
+  border: 1px solid transparent; background: transparent; font-family: inherit;
   transition: all 0.15s; text-decoration: none; white-space: nowrap;
 }
-.app-nav-switch:hover { color: var(--text); background: var(--surface); }
-.app-nav-switch.active { background: var(--surface); color: var(--blue); font-weight: 600; box-shadow: var(--shadow-sm); cursor: default; }
+.app-nav-switch svg { width: 15px; height: 15px; flex-shrink: 0; }
+.app-nav-switch:hover { color: var(--text); background: var(--surface); border-color: var(--border); }
+.app-nav-switch.active { background: var(--surface); color: var(--blue); font-weight: 600; box-shadow: var(--shadow-sm); cursor: default; border-color: var(--border); }
 .app-nav-switch.active svg { color: var(--blue); }
 
 .undo-redo { display: flex; gap: 2px; }
@@ -538,10 +539,11 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
   <div class="app-nav-left">
     <a class="app-nav-logo" href="index.html" title="Home">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
     </a>
   </div>
   <div class="app-nav-switcher">
-    <a class="app-nav-switch" href="amd-email-designer.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Email Designer</a>
+    <a class="app-nav-switch" href="amd-email-designer.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Template Designer</a>
     <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Narrative Designer</span>
   </div>
 </div>
@@ -599,16 +601,12 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
   <div class="app-nav-left">
     <a class="app-nav-logo" href="index.html" title="Home">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
     </a>
   </div>
   <div class="app-nav-switcher">
-    <a class="app-nav-switch" href="amd-email-designer.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Email Designer</a>
-    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Narrative Designer</span>
-  </div>
-</div>
-  <div class="app-nav-switcher">
     <a class="app-nav-switch" href="amd-email-designer.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Template Designer</a>
-    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> In-Line Narrative Template Designer</span>
+    <span class="app-nav-switch active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Narrative Designer</span>
   </div>
 </div>
 <header>
