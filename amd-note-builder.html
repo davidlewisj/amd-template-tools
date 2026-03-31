@@ -96,6 +96,14 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
   transition: background 0.15s, box-shadow 0.15s; font-family: inherit;
 }
 .primary-btn:hover { background: #2563eb; box-shadow: 0 2px 8px rgba(59,130,246,0.35); }
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[contenteditable="true"]:focus-visible {
+  outline: 2px solid rgba(59,130,246,0.35);
+  outline-offset: 1px;
+}
 @keyframes undoShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-3px)} 40%{transform:translateX(3px)} 60%{transform:translateX(-2px)} 80%{transform:translateX(2px)} }
 .shake { animation: undoShake 0.3s ease; }
 
@@ -148,8 +156,12 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 /* Active — clear blue outline, light blue tint */
 .note-section.active .note-sec-inner {
   border-color: var(--blue);
-  background: var(--blue-lt);
+  background: var(--surface);
   box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+}
+/* While selecting table cells for merge, reduce section tint so cell highlights are clearer. */
+.note-section.active.table-merge-selecting .note-sec-inner {
+  background: var(--surface);
 }
 
 /* ── NOTE SECTION TYPES ── */
@@ -168,7 +180,6 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 .note-divider { border: none; border-top: 1px solid var(--border); margin: 8px 0; pointer-events: none; }
 .note-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 4px 0; }
 .note-table td { padding: 6px 10px; border: 1px solid var(--border); vertical-align: top; }
-.note-table td:first-child { font-weight: 600; color: var(--text2); width: 38%; background: var(--surface2); }
 
 /* ── ACTION BAR ── */
 .note-action-bar {
@@ -211,7 +222,7 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 
 /* ── SECTION TYPE LABEL (matching email designer) ── */
 .sec-type-label {
-  display: none; position: absolute; top: 8px; left: 40px; z-index: 30;
+  display: none; position: absolute; top: -10px; right: 10px; z-index: 30;
   background: var(--blue); color: #fff;
   font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
   padding: 3px 7px; border-radius: 20px; pointer-events: none;
@@ -235,14 +246,87 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
   transition: background 0.1s;
 }
 .note-table td[contenteditable]:focus, .note-table th[contenteditable]:focus {
-  background: rgba(59,130,246,0.04); outline: none;
+  background: rgba(59,130,246,0.04);
+  outline: 2px solid var(--blue);
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 1px rgba(59,130,246,0.2);
 }
 .note-table tr.header-row td, .note-table tr.header-row th {
-  font-weight: 700; background: var(--surface2); color: var(--text);
+  font-weight: 700; color: var(--text);
 }
-.note-table td.cell-selected { outline: 2px solid var(--blue); outline-offset: -2px; }
+.note-table td.cell-selected {
+  outline: 2px solid var(--blue);
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 1px rgba(59,130,246,0.2);
+  background: rgba(59,130,246,0.04);
+}
+.note-table td.cell-primary-selected {
+  position: relative;
+  background: rgba(59,130,246,0.26) !important;
+  outline: 3px solid #1d4ed8;
+  outline-offset: -3px;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.7);
+}
 .table-toolbar {
-  display: flex; align-items: center; gap: 4px; margin-top: 6px; flex-wrap: wrap;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 6px;
+}
+.table-step-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.table-step-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.table-step-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+}
+.table-step-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tbl-step-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s;
+}
+.tbl-step-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+.tbl-step-btn.plus:hover { border-color: var(--blue); color: #fff; background: var(--blue); }
+.tbl-step-btn.minus:hover { border-color: #fca5a5; color: #991b1b; background: #fee2e2; }
+.table-secondary-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 .tbl-btn {
   background: var(--surface); border: 1px solid var(--border);
@@ -254,16 +338,180 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 .tbl-btn.danger:hover { border-color: var(--red); color: var(--red); background: #fef2f2; }
 .tbl-btn svg { pointer-events: none; }
 
-/* ── HEADING LEVEL SELECTOR ── */
-.heading-level-picker { display: flex; gap: 3px; flex-wrap: wrap; }
-.hl-btn {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); color: var(--text2); cursor: pointer;
-  font-size: 11px; font-weight: 600; padding: 4px 8px; font-family: inherit;
-  transition: all 0.12s; min-width: 28px; text-align: center;
+#quick-merge-bubble {
+  position: fixed;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.14s ease, transform 0.14s ease;
 }
-.hl-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-lt); }
-.hl-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+#quick-merge-bubble.visible { opacity: 1; pointer-events: auto; }
+#quick-merge-btn {
+  background: var(--blue);
+  color: #fff;
+  border: 1px solid #2563eb;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+}
+#quick-merge-btn:hover { background: #2563eb; }
+
+#quick-col-bubble,
+#quick-row-bubble {
+  position: fixed;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.14s ease, transform 0.14s ease;
+}
+#quick-col-bubble.visible,
+#quick-row-bubble.visible { opacity: 1; pointer-events: auto; }
+.table-edge-bubble {
+  background: var(--blue-lt);
+  border: 1px solid var(--blue-mid);
+  border-radius: 999px;
+  box-shadow: var(--shadow-md);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+#quick-row-bubble .table-edge-bubble {
+  flex-direction: column;
+}
+.table-edge-op {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.table-edge-op.plus:hover { background: var(--blue); border-color: var(--blue); color: #fff; }
+.table-edge-op.minus:hover { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+
+#quick-cell-hint {
+  position: fixed;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.14s ease;
+}
+#quick-cell-hint.visible { opacity: 1; }
+.quick-cell-pill {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 10px;
+  color: var(--text2);
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+.note-table td:empty::before,
+.note-table th:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text3);
+  font-style: italic;
+}
+
+/* ── HEADING LEVEL SELECTOR ── */
+.heading-level-picker { margin-bottom: 10px; }
+.heading-level-dropdown { position: relative; }
+.heading-level-current {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text);
+}
+.heading-level-current:hover { border-color: var(--blue); background: var(--blue-lt); }
+.heading-level-current:focus {
+  outline: 2px solid rgba(59,130,246,0.25);
+  outline-offset: 0;
+  border-color: var(--blue);
+}
+.heading-level-caret {
+  font-size: 11px;
+  color: var(--text3);
+  transition: transform 0.12s ease;
+}
+.heading-level-dropdown.open .heading-level-caret { transform: rotate(180deg); }
+.heading-level-preview-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+.heading-level-code {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  white-space: nowrap;
+}
+.heading-level-preview { color: var(--text); line-height: 1.2; min-width: 0; }
+.heading-level-preview.h1 { font-size: 24px; font-weight: 800; }
+.heading-level-preview.h2 { font-size: 20px; font-weight: 700; }
+.heading-level-preview.h3 { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+.heading-level-preview.h4 { font-size: 14px; font-weight: 700; }
+.heading-level-preview.h5 { font-size: 13px; font-weight: 600; font-style: italic; }
+.heading-level-preview.h6 { font-size: 12px; font-weight: 600; }
+.heading-level-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  display: none;
+  z-index: 20;
+}
+.heading-level-dropdown.open .heading-level-menu { display: block; }
+.heading-level-option {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  text-align: left;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: var(--text);
+  font-family: inherit;
+}
+.heading-level-option:last-child { border-bottom: none; }
+.heading-level-option:hover { background: var(--blue-lt); }
+.heading-level-option.active { background: #e9f2ff; }
+.fmt-toolbar .heading-level-picker {
+  margin-bottom: 0;
+  width: 100%;
+}
+.fmt-toolbar .heading-level-dropdown {
+  width: 100%;
+}
 
 /* ── ADD STRIP ── */
 .add-strip {
@@ -297,9 +545,13 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
   position: fixed; z-index: 900; width: 288px;
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
-  display: none; flex-direction: column; max-height: calc(100vh - 80px); overflow: hidden;
+  display: flex; flex-direction: column; max-height: calc(100vh - 80px); overflow: hidden;
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s ease;
 }
-#float-panel.visible { display: flex; }
+#float-panel.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
 .fp-header {
   display: flex; align-items: center; gap: 8px; padding: 10px 12px;
   border-bottom: 1px solid var(--border); cursor: grab; user-select: none;
@@ -314,12 +566,13 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 .fp-tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
 .fp-close { background: none; border: 1px solid transparent; color: var(--text3); cursor: pointer; line-height: 1; padding: 4px; border-radius: var(--radius-sm); flex-shrink: 0; transition: all 0.12s; display: flex; align-items: center; justify-content: center; }
 .fp-close:hover { color: var(--red); background: #fef2f2; border-color: #fecaca; }
-.fp-body { overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.fp-body { overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
 .fp-body::-webkit-scrollbar { width: 3px; }
 .fp-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
 /* ── PANEL CONTROLS ── */
 .cr { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cr { padding: 2px 0; }
 .cr label { font-size: 11px; color: var(--text2); flex: 1; white-space: nowrap; font-weight: 500; }
 .cr input[type=text], .cr input[type=number], .cr select, .cr textarea {
   background: var(--surface); border: 1px solid var(--border);
@@ -332,6 +585,44 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 .panel-sep { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 .no-sel { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 32px 12px; text-align: center; color: var(--text3); }
 .no-sel p { font-size: 12px; line-height: 1.55; }
+#shortcut-hint { font-size: 11px; color: var(--text3); padding: 0 4px; }
+
+#shortcuts-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.24);
+  z-index: 1400;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+#shortcuts-modal.open { display: flex; }
+.shortcuts-card {
+  width: min(560px, calc(100vw - 28px));
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 14px;
+}
+.shortcuts-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.shortcuts-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.shortcuts-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 10px;
+  font-size: 12px;
+  color: var(--text2);
+}
+.shortcuts-grid kbd {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-family: inherit;
+  color: var(--text);
+  font-size: 11px;
+}
 .cr-full { display: flex; flex-direction: column; gap: 4px; }
 .cr-full label { font-size: 11px; color: var(--text2); font-weight: 500; }
 .cr-full input, .cr-full textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 11px; padding: 5px 7px; outline: none; font-family: inherit; }
@@ -498,7 +789,7 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
 #preview-card ul, #preview-card ol { padding-left: 22px; margin-bottom: 8px; }
 #preview-card table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 8px; }
 #preview-card table td { padding: 6px 10px; border: 1px solid var(--border); vertical-align: top; }
-#preview-card table td:first-child { font-weight: 600; color: var(--text2); width: 38%; background: var(--surface2); }
+#preview-card table td:first-child { font-weight: 600; color: var(--text2); width: 38%; }
 
 /* ── FONT PICKER ── */
 .font-picker { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
@@ -581,7 +872,7 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
         </div>
         <div class="splash-start-text">
           <strong>Use a Template</strong>
-          <span>5 pre-built clinical notes</span>
+            <span>5 pre-built clinical notes</span>
         </div>
       </div>
     </div>
@@ -616,6 +907,7 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
     <span class="modified-dot" id="modified-dot"></span>
   </h1>
   <div class="header-actions">
+    <span id="shortcut-hint">Press ? for shortcuts</span>
     <div class="undo-redo">
       <button id="btn-undo" class="ghost-btn" onclick="undo()" title="Undo (Ctrl+Z)" disabled>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3 13C5 7 10 4 16 5.5A9 9 0 0 1 21 13"/></svg>
@@ -631,6 +923,10 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
     <button class="ghost-btn" id="btn-global" onclick="toggleGlobalPanel()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
       Settings
+    </button>
+    <button class="ghost-btn" id="btn-shortcuts" onclick="openShortcutsModal()" title="Keyboard shortcuts">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 1 1 5.82 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/><circle cx="12" cy="12" r="10"/></svg>
+      Shortcuts
     </button>
     <button class="primary-btn" onclick="copyNote()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -667,6 +963,10 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
       <button class="add-btn" onclick="doAdd('table')">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
         <span class="ab-label">Table</span>
+      </button>
+      <button class="add-btn" onclick="doAdd('rawhtml')">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6 3 12l5 6"/><path d="m16 6 5 6-5 6"/><path d="m14 4-4 16"/></svg>
+        <span class="ab-label">Layout</span>
       </button>
       <button class="add-btn" onclick="doAdd('divider')">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/></svg>
@@ -723,6 +1023,39 @@ header h1 { font-size: 13px; font-weight: 600; color: var(--text); display: flex
   <div class="fp-body" id="fp-body"></div>
 </div>
 
+<div id="quick-merge-bubble">
+  <button id="quick-merge-btn" onclick="quickMergeSelection()">Merge selected</button>
+</div>
+<div id="quick-col-bubble">
+  <div class="table-edge-bubble">
+    <button type="button" class="table-edge-op minus" title="Remove column" onclick="quickTableColRemove()">-</button>
+    <button type="button" class="table-edge-op plus" title="Insert column after" onclick="quickTableColAddAfter()">+</button>
+  </div>
+</div>
+<div id="quick-row-bubble">
+  <div class="table-edge-bubble">
+    <button type="button" class="table-edge-op minus" title="Remove row" onclick="quickTableRowRemove()">-</button>
+    <button type="button" class="table-edge-op plus" title="Insert row below" onclick="quickTableRowAddAfter()">+</button>
+  </div>
+</div>
+<div id="quick-cell-hint"><div class="quick-cell-pill" id="quick-cell-text">Row 1, Col 1</div></div>
+
+<div id="shortcuts-modal" onclick="if(event.target.id==='shortcuts-modal') closeShortcutsModal()">
+  <div class="shortcuts-card">
+    <div class="shortcuts-head">
+      <div class="shortcuts-title">Keyboard Shortcuts</div>
+      <button class="ghost-btn" style="height:28px;padding:0 10px;" onclick="closeShortcutsModal()">Close</button>
+    </div>
+    <div class="shortcuts-grid">
+      <span>Undo / Redo</span><span><kbd>Ctrl/Cmd+Z</kbd> <kbd>Ctrl/Cmd+Y</kbd></span>
+      <span>Move section up / down</span><span><kbd>Alt+Shift+Up</kbd> <kbd>Alt+Shift+Down</kbd></span>
+      <span>Table cell navigation</span><span><kbd>Arrow keys</kbd> <kbd>Tab</kbd></span>
+      <span>Open shortcuts</span><span><kbd>?</kbd></span>
+      <span>Close dialogs</span><span><kbd>Esc</kbd></span>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── STATE ────────────────────────────────────────────────────────────────────
 let sections = [], selectedId = null, historyStack = [], historyIdx = -1;
@@ -736,6 +1069,8 @@ let editDebounce = null;
 let dragSrcId = null;
 let tableDragStart = null; // {secId, row, col}
 let tableSelCells = [];    // [{row,col}] currently selected cells
+let tablePrimaryCell = null; // {row,col} primary merge anchor (first selected)
+let tableActiveSecId = null;
 
 let G = {
   font: "'Helvetica Neue',Helvetica,Arial,sans-serif",
@@ -773,25 +1108,217 @@ function SF(token) {
 
 // ── DEFAULTS ─────────────────────────────────────────────────────────────────
 const D = {
-  heading:   { type:'heading',   label:'Heading',   text:'Section Heading', level:'h3', bg:'', color:'' },
-  paragraph: { type:'paragraph', label:'Paragraph', html:'', bg:'' },
-  list:      { type:'list',      label:'List',      listType:'ul', items:[''], bg:'' },
-  table:     { type:'table',     label:'Table',     rows:[['',''],['','']], cellBgs:{}, hasHeaderRow:false, bg:'' },
+  heading:   { type:'heading',   label:'Heading',   text:'Section Heading', level:'h3', bg:'', color:'', underline:false, underlineColor:'#e2ddd8', underlineWidth:1 },
+  paragraph: { type:'paragraph', label:'Paragraph', html:'', bg:'', underline:false, underlineColor:'#e2ddd8', underlineWidth:1 },
+  list:      { type:'list',      label:'List',      listType:'ul', items:[''], bg:'', underline:false, underlineColor:'#e2ddd8', underlineWidth:1 },
+  table:     { type:'table',     label:'Table',     rows:[['',''],['','']], cellBgs:{}, cellTextStyles:{}, colspans:{}, rowspans:{}, colWidths:[], hasHeaderRow:false, bg:'', showBorders:true, tableStyle:'', cellPadding:'7px 10px' },
+  rawhtml:   { type:'rawhtml',   label:'Layout',    html:'', bg:'' },
   divider:   { type:'divider',   label:'Divider', bg:'' },
   spacer:    { type:'spacer',    label:'Spacer',    height:20 },
 };
+
+function makeTable(opts) {
+  return { ...clone(D.table), id: uid(), ...opts };
+}
+
+function buildSnapDirectShipHTML() {
+  const box = label => `&#9633;${label ? '&nbsp;' + label : ''}`;
+  const line = width => {
+    // Convert pixel width to approximate number of underscores (roughly 1 per 5-6px)
+    let numChars;
+    if (typeof width === 'string') {
+      const px = parseInt(width);
+      numChars = Math.max(3, Math.floor(px / 6));
+    } else {
+      numChars = Math.floor(width / 6);
+    }
+    return '_'.repeat(numChars);
+  };
+  const border = '1px solid #777';
+  const cell = `padding:6px 7px;vertical-align:top;border:${border};color:#000;`;
+  const label = 'font-weight:700;color:#000;';
+  return `
+<div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.22;color:#000;max-width:720px;background:#fff;">
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin:0 0 16px 0;">
+    <colgroup>
+      <col style="width:37%;"><col style="width:60%;"><col style="width:3%;">
+    </colgroup>
+    <tr>
+      <td style="border:none;padding:0;vertical-align:top;font-size:17px;font-weight:700;color:#000;">Snap Diagnostics</td>
+      <td style="border:none;padding:0;vertical-align:top;text-align:right;color:#000;line-height:1.18;">
+        <div style="font-size:17px;font-weight:700;">Direct Ship form</div>
+        <div style="font-size:12px;font-weight:700;margin-top:1px;">For use with Direct Mail-Order Service</div>
+        <div style="font-size:15px;font-weight:700;margin-top:1px;">Primary Fax: (847) 465-3401</div>
+        <div style="font-size:12px;margin-top:1px;">Alternate Fax: (847) 325-0920 or (888) 234-4541</div>
+      </td>
+      <td style="border:none;padding:0 0 0 2px;vertical-align:top;text-align:right;font-size:8px;writing-mode:vertical-rl;text-orientation:mixed;white-space:nowrap;color:#000;">S-F54805 Rev 1</td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.18;margin:0;">
+    <colgroup>
+      <col style="width:15%;"><col style="width:14%;"><col style="width:11%;"><col style="width:11%;"><col style="width:8%;"><col style="width:8%;"><col style="width:11%;"><col style="width:8%;"><col style="width:6%;"><col style="width:8%;">
+    </colgroup>
+    <tr>
+      <td colspan="4" style="${cell}${label}white-space:nowrap;">Patient Name:</td>
+      <td colspan="2" style="${cell}${label}white-space:nowrap;">DOB:</td>
+      <td colspan="4" style="${cell}${label}white-space:nowrap;">Preferred Phone:</td>
+    </tr>
+    <tr>
+      <td colspan="5" style="${cell}${label}white-space:nowrap;">Address:</td>
+      <td colspan="3" style="${cell}${label}white-space:nowrap;">City:</td>
+      <td style="${cell}${label}white-space:nowrap;">State:</td>
+      <td style="${cell}${label}white-space:nowrap;">Zip:</td>
+    </tr>
+    <tr>
+      <td colspan="3" style="${cell}${label}white-space:nowrap;">Height:</td>
+      <td colspan="3" style="${cell}${label}white-space:nowrap;">Weight:</td>
+      <td colspan="2" style="${cell}${label}white-space:nowrap;">Neck Size:</td>
+      <td colspan="2" style="${cell}${label}white-space:nowrap;">Gender:</td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.18;margin:-1px 0 0 0;">
+    <tr>
+      <td style="padding:6px 7px;vertical-align:top;border:${border};color:#000;font-size:12px;"><strong>MEDICAL ORDER</strong> (This section BELOW may be replaced by an approved Electronic Medical Order)</td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.18;margin:-1px 0 0 0;">
+    <colgroup>
+      <col style="width:53%;"><col style="width:47%;">
+    </colgroup>
+    <tr>
+      <td style="${cell}"><strong>Provider Name:</strong><span style="font-size:16px;color:#000;">Joseph G. Smith, DNP</span></td>
+      <td style="${cell}"><strong>Address:</strong><span style="font-size:16px;color:#000;">1380 112th Ave NE Suite 307</span></td>
+    </tr>
+    <tr>
+      <td style="${cell}"><strong>Name of Practice:</strong><span style="font-size:16px;color:#000;">Sleep Solutions NW</span></td>
+      <td style="${cell}"><strong>City:</strong><span style="font-size:16px;color:#000;">Bellevue</span></td>
+    </tr>
+    <tr>
+      <td style="${cell}"><strong>Phone:</strong><span style="font-size:16px;color:#000;">425-278-2250</span></td>
+      <td style="${cell}"><strong>State:</strong><span style="font-size:16px;color:#000;">Washington</span>&nbsp;&nbsp;&nbsp;<strong>Zip:</strong><span style="font-size:16px;color:#000;">98004</span></td>
+    </tr>
+    <tr>
+      <td style="${cell}"><strong>Fax [to send patient test results]:</strong><span style="font-size:16px;color:#000;">425-562-5885</span></td>
+      <td style="${cell}"><strong>E-mail:</strong><span style="font-size:16px;color:#000;">patients@tmjsleepsolutionsnw.com</span></td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.34;margin:-1px 0 0 0;">
+    <tr>
+      <td style="padding:13px 7px 11px 7px;vertical-align:top;border:${border};color:#000;">By signing below, I attest that based on my examination of the patient and his/her medical history, there is a high probability of Obstructive Sleep Apnea. An unattended, type 3 Home Sleep Test with a minimum of 4 channels (airflow, respiratory effort, SpO2 saturation and heart rate), is medically necessary. No co-morbid conditions including, but not limited to, moderate to severe COPD, CHF, OHS, neurodegenerative disorder or cognitive impairment are present that prevent the patient from home sleep testing.</td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.34;margin:-1px 0 0 0;">
+    <tr>
+      <td style="padding:12px 7px 10px 7px;vertical-align:top;border:${border};color:#000;">
+        Test ordered:&nbsp; Type 3, unattended home sleep test for up to 3 nights or other&nbsp; ${line('245px')}<br>
+        ICD-10 code:&nbsp; Default to G47.30 or Other code:&nbsp; ${line('92px')}<br>
+        CPT code:&nbsp; G0399, 95806 or 95800
+      </td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.2;margin:-1px 0 0 0;">
+    <colgroup><col style="width:50%;"><col style="width:50%;"></colgroup>
+    <tr>
+      <td style="padding:10px 7px 12px 7px;vertical-align:top;border:${border};color:#000;font-size:16px;font-weight:700;">Provider Signature:&nbsp; ${line('200px')}</td>
+      <td style="padding:10px 7px 12px 7px;vertical-align:top;border:${border};color:#000;font-size:16px;font-weight:700;">Date of Order:&nbsp; ${line('150px')}</td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.2;margin:-1px 0 0 0;">
+    <tr>
+      <td style="padding:6px 7px;vertical-align:top;border:${border};color:#000;font-weight:700;">Patient Clinical Indication and Medical History Details (check all that apply for the patient)</td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.52;margin:-1px 0 0 0;">
+    <tr>
+      <td style="padding:10px 7px;border:${border};color:#000;vertical-align:top;">
+        <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.72;">
+          <colgroup><col style="width:34%;"><col style="width:33%;"><col style="width:33%;"></colgroup>
+          <tr>
+            <td style="border:none;padding:0 12px 0 0;vertical-align:top;color:#000;">${box('Witnessed apnea events during sleep greater than 10 seconds in duration')}<br>${box('Excessive Daytime Sleepiness')}<br>${box('Atrial Fibrillation (AFIB)')}</td>
+            <td style="border:none;padding:0 12px 0 0;vertical-align:top;color:#000;">${box('Snoring')}<br>${box('Hypertension/High Blood Pressure')}</td>
+            <td style="border:none;padding:0;vertical-align:top;color:#000;">${box('Non-restorative, disturbed or restless sleep')}<br>${box('Gasping/Choking')}<br>${box('Daytime Fatigue')}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.25;margin:-1px 0 0 0;">
+    <tr>
+      <td style="padding:9px 7px;border:${border};color:#000;vertical-align:top;"><strong>Complete this section ONLY if re-testing the patient</strong>&nbsp;&nbsp;&nbsp;&nbsp; Prior DX of Apnea?&nbsp; ${box('No')}&nbsp;&nbsp;${box('Yes')}&nbsp; (If yes, Test Date:&nbsp; ${line('88px')})</td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.42;margin:-1px 0 0 0;">
+    <tr>
+      <td style="padding:10px 7px 11px 7px;border:${border};color:#000;vertical-align:top;">
+        <div>A new sleep test is indicated due to (check all that apply):</div>
+        <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.3;margin-top:8px;">
+          <colgroup><col style="width:32%;"><col style="width:33%;"><col style="width:35%;"></colgroup>
+          <tr>
+            <td style="border:none;padding:0 10px 0 0;vertical-align:top;color:#000;">${box('Weight gain or loss (>10% or BMI >5)')}</td>
+            <td style="border:none;padding:0 10px 0 0;vertical-align:top;color:#000;">${box('Evaluate therapy effectiveness')}</td>
+            <td style="border:none;padding:0;vertical-align:top;color:#000;">${box('Evaluate need to continue therapy')}</td>
+          </tr>
+        </table>
+        <div style="margin-top:14px;">Is the test:&nbsp; ${box('Pre')} or ${box('Post treatment?')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Indicate type of treatment:&nbsp; ${box('Surgery')}&nbsp;&nbsp;${box('Oral Appliance')}&nbsp;&nbsp;${box('PAP')}&nbsp;&nbsp;${box('Other')}</div>
+      </td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.18;margin:-1px 0 0 0;">
+    <colgroup>
+      <col style="width:30%;"><col style="width:37%;"><col style="width:15%;"><col style="width:18%;">
+    </colgroup>
+    <tr>
+      <td colspan="2" style="padding:6px 7px;border:${border};color:#000;font-weight:700;">Patient's Primary / Secondary Insurance</td>
+      <td colspan="2" style="padding:6px 7px;border:${border};color:#000;font-weight:700;">Name of Insured <em>(if not patient)</em>:</td>
+    </tr>
+    <tr>
+      <td colspan="2" style="padding:6px 7px;border:${border};color:#000;"><strong>Primary Insurance Name:</strong></td>
+      <td style="padding:6px 7px;border:${border};color:#000;"><strong>Group #</strong></td>
+      <td style="padding:6px 7px;border:${border};color:#000;"><strong>ID #</strong></td>
+    </tr>
+    <tr>
+      <td colspan="2" style="padding:6px 7px;border:${border};color:#000;"><strong>Secondary Insurance Name:</strong></td>
+      <td style="padding:6px 7px;border:${border};color:#000;"><strong>Group #</strong></td>
+      <td style="padding:6px 7px;border:${border};color:#000;"><strong>ID #</strong></td>
+    </tr>
+    <tr>
+      <td style="padding:6px 7px;border:${border};color:#000;"><strong>Send Snap Test Report to DME?</strong>&nbsp; ${box('Yes')}</td>
+      <td style="padding:6px 7px;border:${border};color:#000;"><strong>DME Name:</strong></td>
+      <td colspan="2" style="padding:6px 7px;border:${border};color:#000;"><strong>Fax:</strong></td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-top:10px;font-size:11px;color:#000;">
+    <tr>
+      <td style="border:none;padding:0;text-align:left;">QF-54805 Rev S</td>
+      <td style="border:none;padding:0;text-align:right;">Page 1 of 2</td>
+    </tr>
+  </table>
+</div>`;
+}
 
 // ── TEMPLATES ────────────────────────────────────────────────────────────────
 const TPLS = {
   hst_consult: () => [
     { ...clone(D.heading),   id:uid(), text:'Patient Information' },
-    { ...clone(D.table),     id:uid(), rows:[
+    makeTable({ rows:[
       ['Patient',`${SF('PatientName')}`],
       ['Date of Birth',''],
       ['Date of Visit',`${SF('ApptDateLinkedNote')}`],
       ['Provider',`${SF('ProviderName')}`],
       ['Facility',`${SF('GroupName')}`],
-    ]},
+    ]}),
     { ...clone(D.heading),   id:uid(), text:'Chief Complaint' },
     { ...clone(D.paragraph), id:uid(), html:`${SF('PatientFirstName')} presents for initial consultation regarding suspected sleep-disordered breathing.` },
     { ...clone(D.heading),   id:uid(), text:'Sleep History' },
@@ -799,10 +1326,10 @@ const TPLS = {
     { ...clone(D.heading),   id:uid(), text:'Medical History' },
     { ...clone(D.list),      id:uid(), listType:'ul', items:['Hypertension: ___','Obesity: ___','Cardiovascular disease: ___','Diabetes: ___','Other: ___'] },
     { ...clone(D.heading),   id:uid(), text:'Physical Examination' },
-    { ...clone(D.table),     id:uid(), rows:[
+    makeTable({ rows:[
       ['BMI',''],['Neck circumference',''],['Blood pressure',''],
       ['Mallampati score',''],['Tonsil grade',''],['Retrognathia',''],
-    ]},
+    ]}),
     { ...clone(D.heading),   id:uid(), text:'Assessment' },
     { ...clone(D.paragraph), id:uid(), html:`${SF('PatientFirstName')} is a ___ year old patient presenting with symptoms consistent with obstructive sleep apnea. Clinical presentation warrants further evaluation with home sleep testing.` },
     { ...clone(D.heading),   id:uid(), text:'Plan' },
@@ -816,20 +1343,20 @@ const TPLS = {
 
   sleep_interp: () => [
     { ...clone(D.heading),   id:uid(), text:'Patient Information' },
-    { ...clone(D.table),     id:uid(), rows:[
+    makeTable({ rows:[
       ['Patient',`${SF('PatientName')}`],
       ['Date of Birth',''],
       ['Study Date',`${SF('ApptDateLinkedNote')}`],
       ['Interpreting Provider',`${SF('ProviderName')}`],
       ['Ordering Facility',`${SF('GroupName')}`],
-    ]},
+    ]}),
     { ...clone(D.heading),   id:uid(), text:'Study Type & Device' },
-    { ...clone(D.table),     id:uid(), rows:[
+    makeTable({ rows:[
       ['Study type','Home Sleep Test (HST)'],
       ['Device used',''],['Recording duration',''],['Total sleep time estimated',''],
-    ]},
+    ]}),
     { ...clone(D.heading),   id:uid(), text:'Key Findings' },
-    { ...clone(D.table),     id:uid(), rows:[
+    makeTable({ rows:[
       ['AHI (Apnea-Hypopnea Index)',''],
       ['RDI (Respiratory Disturbance Index)',''],
       ['ODI (Oxygen Desaturation Index)',''],
@@ -837,7 +1364,7 @@ const TPLS = {
       ['Mean O₂ saturation',''],
       ['% time below 90% SpO₂',''],
       ['Snoring index',''],
-    ]},
+    ]}),
     { ...clone(D.heading),   id:uid(), text:'Interpretation' },
     { ...clone(D.paragraph), id:uid(), html:`The results of ${SF('PatientFirstName')}'s home sleep test are consistent with <strong>___ (mild / moderate / severe)</strong> obstructive sleep apnea based on an AHI of ___ events/hour. ` },
     { ...clone(D.heading),   id:uid(), text:'Recommendations' },
@@ -854,17 +1381,17 @@ const TPLS = {
 
   osd_fitting: () => [
     { ...clone(D.heading),   id:uid(), text:'Patient Information' },
-    { ...clone(D.table),     id:uid(), rows:[
+    makeTable({ rows:[
       ['Patient',`${SF('PatientName')}`],
       ['Date of Visit',`${SF('ApptDateLinkedNote')}`],
       ['Provider',`${SF('ProviderName')}`],
       ['Facility',`${SF('GroupName')}`],
-    ]},
+    ]}),
     { ...clone(D.heading),   id:uid(), text:'Device Details' },
-    { ...clone(D.table),     id:uid(), rows:[
+    makeTable({ rows:[
       ['Device name',''],['Manufacturer',''],['Upper arch size',''],
       ['Lower arch size',''],['Initial advancement setting',''],['Serial number',''],
-    ]},
+    ]}),
     { ...clone(D.heading),   id:uid(), text:'Fitting Notes' },
     { ...clone(D.paragraph), id:uid(), html:`Device was fitted for ${SF('PatientFirstName')} today. Fit was assessed for comfort, retention, and occlusal balance. Patient reported the device as <strong>comfortable / acceptable / requiring adjustment</strong>. ` },
     { ...clone(D.heading),   id:uid(), text:'Bite Registration & Occlusion' },
@@ -886,19 +1413,19 @@ const TPLS = {
 
   followup: () => [
     { ...clone(D.heading),   id:uid(), text:'Patient Information' },
-    { ...clone(D.table),     id:uid(), rows:[
+    makeTable({ rows:[
       ['Patient',`${SF('PatientName')}`],
       ['Date of Visit',`${SF('ApptDateLinkedNote')}`],
       ['Provider',`${SF('ProviderName')}`],
       ['Visit Type','Follow-Up'],
-    ]},
+    ]}),
     { ...clone(D.heading),   id:uid(), text:'Interval History' },
     { ...clone(D.paragraph), id:uid(), html:`${SF('PatientFirstName')} returns for follow-up evaluation. Since last visit, patient reports <strong>improvement / no change / worsening</strong> of sleep quality. ` },
     { ...clone(D.heading),   id:uid(), text:'Treatment Compliance Review' },
-    { ...clone(D.table),     id:uid(), rows:[
+    makeTable({ rows:[
       ['Treatment modality',''],['Nightly usage (avg hrs)',''],
       ['Subjective compliance',''],['Side effects reported',''],['ESS score today',''],
-    ]},
+    ]}),
     { ...clone(D.heading),   id:uid(), text:'Examination' },
     { ...clone(D.paragraph), id:uid(), html:'Patient appears well. Airway examination unchanged from baseline. Oral appliance fit remains adequate with no signs of wear or distortion. No new dental or TMJ concerns noted.' },
     { ...clone(D.heading),   id:uid(), text:'Assessment' },
@@ -916,23 +1443,23 @@ const TPLS = {
 
   cpap_setup: () => [
     { ...clone(D.heading),   id:uid(), text:'Patient Information' },
-    { ...clone(D.table),     id:uid(), rows:[
+    makeTable({ rows:[
       ['Patient',`${SF('PatientName')}`],
       ['Date of Setup',`${SF('ApptDateLinkedNote')}`],
       ['Setup Performed By',`${SF('ProviderName')}`],
       ['Facility',`${SF('GroupName')}`],
-    ]},
+    ]}),
     { ...clone(D.heading),   id:uid(), text:'Device & Settings' },
-    { ...clone(D.table),     id:uid(), rows:[
+    makeTable({ rows:[
       ['Device type','CPAP / APAP / BiPAP'],['Manufacturer',''],['Model',''],
       ['Serial number',''],['Prescribed pressure',''],['APAP range',''],
       ['Ramp time',''],['Humidity setting',''],
-    ]},
+    ]}),
     { ...clone(D.heading),   id:uid(), text:'Interface' },
-    { ...clone(D.table),     id:uid(), rows:[
+    makeTable({ rows:[
       ['Mask type','Full face / Nasal / Nasal pillow'],
       ['Mask brand & model',''],['Mask size',''],['Headgear size',''],
-    ]},
+    ]}),
     { ...clone(D.heading),   id:uid(), text:'Supplies Issued' },
     { ...clone(D.list),      id:uid(), listType:'ul', items:[
       'CPAP/APAP/BiPAP device with power supply',
@@ -957,6 +1484,7 @@ const TPLS = {
     { ...clone(D.heading),   id:uid(), text:'Provider Signature' },
     { ...clone(D.paragraph), id:uid(), html:`${SF('ProviderName')}, ${SF('ProviderFullName')}<br>Date: ${SF('ApptDateLinkedNote')}` },
   ],
+
 };
 
 // ── SPLASH ───────────────────────────────────────────────────────────────────
@@ -983,7 +1511,21 @@ function returnToSplash() {
 }
 function startScratch() { sections = []; selectedId = null; pushHist(); renderCanvas(); dismissSplash(); setModified(false); }
 
-function startTemplate(k)   { sections = TPLS[k](); selectedId = null; pushHist(); renderCanvas(); dismissSplash(); setModified(false); }
+function startTemplate(k) {
+  if (!TPLS[k]) return;
+  sections = TPLS[k]();
+  selectedId = null;
+  pushHist();
+  renderCanvas();
+  dismissSplash();
+  setModified(false);
+}
+
+function toggleTplList() {
+  const el = document.getElementById('splash-tpl-list');
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
 
 // ── HISTORY ──────────────────────────────────────────────────────────────────
 function pushHist() {
@@ -1034,6 +1576,7 @@ function delSection(id) {
   else { sections = sections.filter(s => s.id !== id); if (selectedId===id){selectedId=null;closePanel();} pushHist(); renderCanvas(); }
 }
 function moveSection(id, dir) {
+  if (tableActiveSecId && selectedId !== tableActiveSecId) clearTableSelection();
   const i = sections.findIndex(s => s.id === id), j = i + dir;
   if (j < 0 || j >= sections.length) return;
   [sections[i], sections[j]] = [sections[j], sections[i]];
@@ -1090,6 +1633,8 @@ function saveActiveEditable() {
     } else if (field === 'cell') {
       const r = parseInt(el.dataset.row), c = parseInt(el.dataset.col);
       if (sec.rows && sec.rows[r]) sec.rows[r][c] = el.innerHTML;
+    } else if (field === 'html') {
+      sec.html = el.innerHTML;
     } else if (field) {
       sec[field] = el.innerHTML || el.textContent;
     }
@@ -1124,10 +1669,12 @@ function renderCanvas() {
   const dragGrip = `<svg width="12" height="16" viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1.5" fill="currentColor"/><circle cx="8" cy="3" r="1.5" fill="currentColor"/><circle cx="4" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="4" cy="13" r="1.5" fill="currentColor"/><circle cx="8" cy="13" r="1.5" fill="currentColor"/></svg>`;
 
   sections.forEach((sec, idx) => {
+    let dragArmed = false;
     const wrap = document.createElement('div');
     wrap.className = 'note-section' + (sec.id === selectedId ? ' active' : '') + (sec.hidden ? ' hidden-sec' : '');
     wrap.dataset.id = sec.id;
     wrap.dataset.idx = idx;
+    // Keep draggable enabled and arm only from handle for reliable drag start.
     wrap.draggable = true;
 
     const inner = document.createElement('div');
@@ -1146,12 +1693,22 @@ function renderCanvas() {
     });
 
     // Drag-and-drop reorder
+    wrap.addEventListener('mousedown', e => {
+      dragArmed = !!e.target.closest('.sec-drag-handle');
+    });
+    wrap.addEventListener('mouseup', () => { dragArmed = false; });
+
     wrap.addEventListener('dragstart', e => {
+      if (!dragArmed && !e.target.closest('.sec-drag-handle')) {
+        e.preventDefault();
+        return;
+      }
       dragSrcId = sec.id; e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', sec.id);
       setTimeout(() => wrap.classList.add('dragging-sec'), 0);
     });
     wrap.addEventListener('dragend', () => {
+      dragArmed = false;
       wrap.classList.remove('dragging-sec'); dragSrcId = null;
       document.querySelectorAll('.drop-indicator').forEach(el => el.remove());
     });
@@ -1187,6 +1744,7 @@ function renderCanvas() {
   if (selectedId || showingGlobal) renderFpBody();
   updateCount();
   wireEditables();
+  syncTableFloatingControls();
 }
 
 function updateCount() {
@@ -1205,6 +1763,8 @@ function onEditableInput(el) {
   } else if (field === 'cell') {
     const r = parseInt(el.dataset.row), c = parseInt(el.dataset.col);
     if (sec.rows && sec.rows[r]) sec.rows[r][c] = el.innerHTML;
+  } else if (field === 'html') {
+    sec.html = el.innerHTML;
   } else if (field) {
     sec[field] = el.innerHTML;
   }
@@ -1253,6 +1813,11 @@ function wireEditables() {
     updatePlaceholder();
     el.addEventListener('input', () => { onEditableInput(el); updatePlaceholder(); });
     el.addEventListener('focus', () => {
+      const secId = el.dataset.secId;
+      const isTableCell = el.dataset.field === 'cell';
+      if (!isTableCell || tableActiveSecId !== secId) {
+        clearTableSelection();
+      }
       selectedId = el.dataset.secId;
       document.querySelectorAll('.note-section').forEach(s => s.classList.toggle('active', s.dataset.id === el.dataset.secId));
       openPanel(el.dataset.secId);
@@ -1274,54 +1839,72 @@ function buildSecDOM(sec) {
       const styles = {
         h1: 'font-size:28px;font-weight:800;line-height:1.2;margin:8px 0 4px;',
         h2: 'font-size:22px;font-weight:700;line-height:1.3;margin:8px 0 4px;',
-        h3: 'font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);padding-bottom:4px;margin:8px 0 4px;',
+        h3: 'font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding-bottom:4px;margin:8px 0 4px;',
         h4: 'font-size:14px;font-weight:700;margin:6px 0 2px;',
         h5: 'font-size:13px;font-weight:600;font-style:italic;margin:4px 0 2px;',
         h6: 'font-size:12px;font-weight:600;color:var(--text2);margin:4px 0 2px;',
       };
       const colorStyle = sec.color ? `color:${sec.color};` : '';
-      return `<div contenteditable="true" data-sec-id="${sec.id}" data-field="text" data-placeholder="Heading…" style="${styles[lvl]||styles.h3}${colorStyle}font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;">${sec.text||''}</div>`;
+      const underlineStyle = sec.underline ? `border-bottom:${sec.underlineWidth||1}px solid ${sec.underlineColor||'#e2ddd8'};padding-bottom:4px;` : '';
+      return `<div contenteditable="true" data-sec-id="${sec.id}" data-field="text" data-placeholder="Heading…" style="${styles[lvl]||styles.h3}${underlineStyle}${colorStyle}font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;">${sec.text||''}</div>`;
     }
 
     case 'paragraph':
-      return `<div class="note-body" contenteditable="true" data-sec-id="${sec.id}" data-field="html" data-placeholder="Begin typing your clinical note…" style="font-family:${f};font-size:${fs}px;">${sec.html||''}</div>`;
+      return `<div class="note-body" contenteditable="true" data-sec-id="${sec.id}" data-field="html" data-placeholder="Begin typing your clinical note…" style="font-family:${f};font-size:${fs}px;${sec.underline?`border-bottom:${sec.underlineWidth||1}px solid ${sec.underlineColor||'#e2ddd8'};padding-bottom:4px;`:''}">${sec.html||''}</div>`;
+
+    case 'rawhtml':
+      return `<div class="note-body" contenteditable="true" data-sec-id="${sec.id}" data-field="html" data-placeholder="Paste or build custom HTML layout…" style="font-family:${f};font-size:${fs}px;line-height:1.45;">${sec.html||''}</div>`;
 
     case 'list': {
       const items = (sec.items || ['']).map((item, i) =>
         `<li>${editable(sec.id,'item',item,'List item…',`font-family:${f};font-size:${fs}px;display:block;`,`data-idx="${i}"`)}</li>`
       ).join('');
-      return `<${sec.listType||'ul'} class="note-list">${items}</${sec.listType||'ul'}>
+      return `<${sec.listType||'ul'} class="note-list" style="${sec.underline?`border-bottom:${sec.underlineWidth||1}px solid ${sec.underlineColor||'#e2ddd8'};padding-bottom:4px;`:''}">${items}</${sec.listType||'ul'}>
         <button onclick="addListItem('${sec.id}')" style="margin-top:4px;background:none;border:none;color:var(--blue);font-size:11px;cursor:pointer;padding:2px 0;font-family:inherit;">+ Add item</button>`;
     }
 
     case 'table': {
       const cellBgs = sec.cellBgs || {};
+      const cellTextStyles = sec.cellTextStyles || {};
+      const colspans = sec.colspans || {};
+      const rowspans = sec.rowspans || {};
+      const colWidths = Array.isArray(sec.colWidths) ? sec.colWidths : [];
+      const showBorders = sec.showBorders !== false;
+      const tableStyle = sec.tableStyle || '';
+      const cellPadding = sec.cellPadding || '7px 10px';
+      const colGroup = colWidths.length
+        ? `<colgroup>${colWidths.map(w => `<col style="width:${typeof w === 'number' ? `${w}%` : w};">`).join('')}</colgroup>`
+        : '';
       const rows = (sec.rows || []).map((row, r) => {
         const isHeader = sec.hasHeaderRow && r === 0;
-        const cells = row.map((cell, c) => {
+        let cells = '';
+        row.forEach((cell, c) => {
+          // Cells set to null are merged into a previous cell and should not render.
+          if (cell === null) return;
           const key = `${r}_${c}`;
-          const bgStyle = cellBgs[key] ? `background:${cellBgs[key]};` : (isHeader ? 'background:var(--surface2);' : '');
+          const bgStyle = cellBgs[key] ? `background:${cellBgs[key]};` : '';
           const fwStyle = isHeader ? 'font-weight:700;' : '';
-          return `<td contenteditable="true" data-sec-id="${sec.id}" data-field="cell" data-row="${r}" data-col="${c}"
-            style="${bgStyle}${fwStyle}"
+          const txt = cellTextStyles[key] || {};
+          const textStyle = `${txt.color ? `color:${txt.color};` : ''}${txt.fontWeight ? `font-weight:${txt.fontWeight};` : ''}${txt.fontStyle ? `font-style:${txt.fontStyle};` : ''}${txt.textDecoration ? `text-decoration:${txt.textDecoration};` : ''}`;
+          const borderStyle = `border:${showBorders ? '1px solid var(--border)' : 'none'};`;
+          const padStyle = `padding:${cellPadding};`;
+          const colSpan = Math.max(1, parseInt(colspans[key] || 1, 10));
+          const rowSpan = Math.max(1, parseInt(rowspans[key] || 1, 10));
+          const colspanAttr = colSpan > 1 ? ` colspan="${colSpan}"` : '';
+          const rowspanAttr = rowSpan > 1 ? ` rowspan="${rowSpan}"` : '';
+          const mergeClass = (colSpan > 1 || rowSpan > 1) ? ' merged-anchor' : '';
+          const mergeMarker = (colSpan > 1 || rowSpan > 1) ? `${rowSpan}x${colSpan}` : '';
+          const placeholder = isHeader ? 'Header text' : 'Type text';
+          cells += `<td contenteditable="true" data-sec-id="${sec.id}" data-field="cell" data-row="${r}" data-col="${c}"${colspanAttr}${rowspanAttr}
+            class="${mergeClass.trim()}" data-merge-marker="${mergeMarker}" style="${borderStyle}${padStyle}${bgStyle}${fwStyle}${textStyle}"
             onmousedown="tableDragBegin(event,'${sec.id}',${r},${c})"
             onmouseover="tableDragOver(event,'${sec.id}',${r},${c})"
-            data-placeholder="">${cell||''}</td>`;
-        }).join('');
+            data-placeholder="${placeholder}">${cell||''}</td>`;
+        });
         return `<tr class="${isHeader?'header-row':''}">${cells}</tr>`;
       }).join('');
 
-      const plusR = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
-      const minR  = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
-      return `<table class="note-table"><tbody>${rows}</tbody></table>
-        <div class="table-toolbar">
-          <button class="tbl-btn" onclick="addTableRow('${sec.id}')">${plusR} Row</button>
-          <button class="tbl-btn danger" onclick="removeTableRow('${sec.id}')">${minR} Row</button>
-          <button class="tbl-btn" onclick="addTableCol('${sec.id}')">${plusR} Col</button>
-          <button class="tbl-btn danger" onclick="removeTableCol('${sec.id}')">${minR} Col</button>
-          <button class="tbl-btn" onclick="toggleHeaderRow('${sec.id}')">${sec.hasHeaderRow?'Remove':'Add'} Header</button>
-          <button class="tbl-btn" onclick="mergeSelectedCells('${sec.id}')">Merge</button>
-        </div>`;
+      return `<table class="note-table" style="${tableStyle}">${colGroup}<tbody>${rows}</tbody></table>`;
     }
 
     case 'divider':
@@ -1346,99 +1929,527 @@ function addListItem(id) {
     if (items.length) items[items.length - 1].focus();
   }, 60);
 }
-function addTableRow(id) {
+function normalizeTableMergedCells(sec) {
+  if (!sec || !sec.rows) return;
+  sec.rows = sec.rows.map(row => row.map(cell => (cell === null ? '' : cell)));
+  sec.colspans = {};
+  sec.rowspans = {};
+}
+function validateTableState(sec) {
+  if (!sec || sec.type !== 'table' || !Array.isArray(sec.rows) || !sec.rows.length) return;
+
+  const maxCols = sec.rows.reduce((m, row) => Math.max(m, Array.isArray(row) ? row.length : 0), 0);
+  if (!maxCols) {
+    sec.rows = [['']];
+  } else {
+    sec.rows = sec.rows.map(row => {
+      const next = Array.isArray(row) ? [...row] : [];
+      while (next.length < maxCols) next.push('');
+      if (next.length > maxCols) next.length = maxCols;
+      return next;
+    });
+  }
+
+  const keepMapInBounds = (map) => {
+    const out = {};
+    Object.keys(map || {}).forEach(k => {
+      const [r, c] = k.split('_').map(Number);
+      if (Number.isNaN(r) || Number.isNaN(c)) return;
+      if (!sec.rows[r] || sec.rows[r][c] === undefined) return;
+      out[k] = map[k];
+    });
+    return out;
+  };
+  sec.cellBgs = keepMapInBounds(sec.cellBgs || {});
+  sec.cellTextStyles = keepMapInBounds(sec.cellTextStyles || {});
+
+  const sanitizeSpanMap = (map, isRowSpan) => {
+    const out = {};
+    Object.keys(map || {}).forEach(k => {
+      const [r, c] = k.split('_').map(Number);
+      const span = parseInt(map[k], 10);
+      if (Number.isNaN(r) || Number.isNaN(c) || Number.isNaN(span) || span < 2) return;
+      if (!sec.rows[r] || sec.rows[r][c] === undefined || sec.rows[r][c] === null) return;
+      const maxSpan = isRowSpan ? (sec.rows.length - r) : (sec.rows[0].length - c);
+      if (maxSpan < 2) return;
+      out[k] = Math.min(span, maxSpan);
+    });
+    return out;
+  };
+  sec.colspans = sanitizeSpanMap(sec.colspans || {}, false);
+  sec.rowspans = sanitizeSpanMap(sec.rowspans || {}, true);
+}
+
+function getCurrentTableCoordLabel() {
+  if (!tablePrimaryCell) return 'Row -, Col -';
+  return `Row ${tablePrimaryCell.row + 1}, Col ${tablePrimaryCell.col + 1}`;
+}
+function shiftMapRows(map, idx, delta) {
+  if (!map) return map;
+  const out = {};
+  Object.keys(map).forEach(k => {
+    const parts = k.split('_');
+    const r = parseInt(parts[0], 10), c = parseInt(parts[1], 10);
+    if (Number.isNaN(r) || Number.isNaN(c)) return;
+    if (delta < 0 && r === idx) return;
+    const nr = r >= idx ? r + delta : r;
+    if (nr < 0) return;
+    out[`${nr}_${c}`] = map[k];
+  });
+  return out;
+}
+function shiftMapCols(map, idx, delta) {
+  if (!map) return map;
+  const out = {};
+  Object.keys(map).forEach(k => {
+    const parts = k.split('_');
+    const r = parseInt(parts[0], 10), c = parseInt(parts[1], 10);
+    if (Number.isNaN(r) || Number.isNaN(c)) return;
+    if (delta < 0 && c === idx) return;
+    const nc = c >= idx ? c + delta : c;
+    if (nc < 0) return;
+    out[`${r}_${nc}`] = map[k];
+  });
+  return out;
+}
+function addTableRowAt(id, insertIdx) {
   saveActiveEditable();
   const sec = getSec(id); if (!sec || !sec.rows) return;
+  normalizeTableMergedCells(sec);
   const cols = sec.rows[0] ? sec.rows[0].length : 2;
-  sec.rows.push(Array(cols).fill(''));
+  const idx = Math.max(0, Math.min(insertIdx, sec.rows.length));
+  sec.rows.splice(idx, 0, Array(cols).fill(''));
+  sec.cellBgs = shiftMapRows(sec.cellBgs || {}, idx, 1);
+  sec.cellTextStyles = shiftMapRows(sec.cellTextStyles || {}, idx, 1);
+  validateTableState(sec);
   pushHist(); skipSaveOnRender = true; renderCanvas();
 }
-function removeTableRow(id) {
+function removeTableRowAt(id, rowIdx) {
   saveActiveEditable();
   const sec = getSec(id); if (!sec || !sec.rows || sec.rows.length <= 1) return;
-  sec.rows.pop();
+  normalizeTableMergedCells(sec);
+  const idx = Math.max(0, Math.min(rowIdx, sec.rows.length - 1));
+  sec.rows.splice(idx, 1);
+  sec.cellBgs = shiftMapRows(sec.cellBgs || {}, idx, -1);
+  sec.cellTextStyles = shiftMapRows(sec.cellTextStyles || {}, idx, -1);
+  validateTableState(sec);
   pushHist(); skipSaveOnRender = true; renderCanvas();
 }
-function addTableCol(id) {
+function addTableColAt(id, insertIdx) {
   saveActiveEditable();
   const sec = getSec(id); if (!sec || !sec.rows) return;
-  sec.rows = sec.rows.map(r => [...r, '']);
+  normalizeTableMergedCells(sec);
+  const cols = sec.rows[0] ? sec.rows[0].length : 0;
+  const idx = Math.max(0, Math.min(insertIdx, cols));
+  sec.rows = sec.rows.map(r => {
+    const next = [...r];
+    next.splice(idx, 0, '');
+    return next;
+  });
+  sec.cellBgs = shiftMapCols(sec.cellBgs || {}, idx, 1);
+  sec.cellTextStyles = shiftMapCols(sec.cellTextStyles || {}, idx, 1);
+  validateTableState(sec);
   pushHist(); skipSaveOnRender = true; renderCanvas();
 }
-function removeTableCol(id) {
+function removeTableColAt(id, colIdx) {
   saveActiveEditable();
   const sec = getSec(id); if (!sec || !sec.rows) return;
   const cols = sec.rows[0] ? sec.rows[0].length : 0;
   if (cols <= 1) return;
-  sec.rows = sec.rows.map(r => r.slice(0, -1));
-  // Also clean up cellBgs for removed col
-  if (sec.cellBgs) {
-    Object.keys(sec.cellBgs).forEach(k => {
-      const [, c] = k.split('_').map(Number);
-      if (c >= cols - 1) delete sec.cellBgs[k];
-    });
-  }
+  normalizeTableMergedCells(sec);
+  const idx = Math.max(0, Math.min(colIdx, cols - 1));
+  sec.rows = sec.rows.map(r => {
+    const next = [...r];
+    next.splice(idx, 1);
+    return next;
+  });
+  sec.cellBgs = shiftMapCols(sec.cellBgs || {}, idx, -1);
+  sec.cellTextStyles = shiftMapCols(sec.cellTextStyles || {}, idx, -1);
+  validateTableState(sec);
   pushHist(); skipSaveOnRender = true; renderCanvas();
+}
+function addTableRow(id) {
+  const sec = getSec(id); if (!sec || !sec.rows) return;
+  addTableRowAt(id, sec.rows.length);
+}
+function removeTableRow(id) {
+  const sec = getSec(id); if (!sec || !sec.rows) return;
+  removeTableRowAt(id, sec.rows.length - 1);
+}
+function addTableCol(id) {
+  const sec = getSec(id); if (!sec || !sec.rows) return;
+  const cols = sec.rows[0] ? sec.rows[0].length : 0;
+  addTableColAt(id, cols);
+}
+function removeTableCol(id) {
+  const sec = getSec(id); if (!sec || !sec.rows) return;
+  const cols = sec.rows[0] ? sec.rows[0].length : 0;
+  removeTableColAt(id, cols - 1);
 }
 function toggleHeaderRow(id) {
   saveActiveEditable();
   const sec = getSec(id); if (!sec) return;
   sec.hasHeaderRow = !sec.hasHeaderRow;
+
+  if (sec.hasHeaderRow) {
+    if (!sec.cellBgs) sec.cellBgs = {};
+    if (!sec.cellTextStyles) sec.cellTextStyles = {};
+    const firstRow = sec.rows && sec.rows[0] ? sec.rows[0] : [];
+    firstRow.forEach((cell, c) => {
+      if (cell === null) return;
+      const key = `0_${c}`;
+      if (!sec.cellBgs[key]) sec.cellBgs[key] = '#f2f0ed';
+      if (!sec.cellTextStyles[key]) sec.cellTextStyles[key] = {};
+      if (!sec.cellTextStyles[key].fontWeight) sec.cellTextStyles[key].fontWeight = '700';
+    });
+  }
+
+  validateTableState(sec);
+
   pushHist(); skipSaveOnRender = true; renderCanvas();
 }
 function mergeSelectedCells(id) {
-  // Simple colspan merge — merges all selected cells in the same row into the leftmost
+  // Supports single-row (colspan) and single-column (rowspan) merges.
   if (!tableSelCells.length) return;
   saveActiveEditable();
   const sec = getSec(id); if (!sec || !sec.rows) return;
-  // Group selected cells by row
-  const byRow = {};
-  tableSelCells.forEach(({row, col}) => {
-    if (!byRow[row]) byRow[row] = [];
-    byRow[row].push(col);
-  });
-  Object.entries(byRow).forEach(([r, cols]) => {
-    if (cols.length < 2) return;
-    cols.sort((a,b) => a-b);
-    const ri = parseInt(r);
-    // Combine content into first cell
-    const combined = cols.map(c => sec.rows[ri][c]).filter(Boolean).join(' ');
-    sec.rows[ri][cols[0]] = combined;
-    // Mark merged cells as null (will be skipped in render)
-    cols.slice(1).forEach(c => { sec.rows[ri][c] = null; });
-    // Store colspan on the data
+  const selectedCells = tableSelCells
+    .filter(({row, col}) => sec.rows[row] && sec.rows[row][col] !== null)
+    .filter((cell, i, arr) => arr.findIndex(x => x.row === cell.row && x.col === cell.col) === i);
+  if (selectedCells.length < 2) return;
+
+  const uniqueRows = [...new Set(selectedCells.map(s => s.row))].sort((a,b) => a-b);
+  const uniqueCols = [...new Set(selectedCells.map(s => s.col))].sort((a,b) => a-b);
+  const primary = tablePrimaryCell || tableSelCells[0];
+  if (!primary) return;
+
+  const hasCellContent = (v) => {
+    if (v === null || v === undefined) return false;
+    const s = String(v);
+    const normalized = s
+      .replace(/<br\s*\/?>/gi, '')
+      .replace(/&nbsp;/gi, '')
+      .replace(/\s+/g, '')
+      .trim();
+    return normalized.length > 0;
+  };
+
+  // Horizontal merge: one row, multiple columns.
+  if (uniqueRows.length === 1 && uniqueCols.length >= 2) {
+    const r = uniqueRows[0];
+    const cols = uniqueCols;
+    const firstCol = cols[0];
+    // Always anchor horizontal merges at the furthest-left selected cell.
+    tablePrimaryCell = { row: r, col: firstCol };
+    const nonPrimaryHasContent = cols.slice(1).some(c => hasCellContent(sec.rows[r] && sec.rows[r][c]));
+    if (nonPrimaryHasContent) {
+      const ok = confirm('One or more cells being merged contain content. Any content not in the primary cell will be deleted. Continue?');
+      if (!ok) return;
+    }
+
+    // Keep primary cell content exactly as-is; all non-primary cells are removed.
+    cols.slice(1).forEach(c => { if (sec.rows[r]) sec.rows[r][c] = null; });
+
     if (!sec.colspans) sec.colspans = {};
-    sec.colspans[`${ri}_${cols[0]}`] = cols.length;
-  });
+    if (!sec.rowspans) sec.rowspans = {};
+    sec.colspans[`${r}_${firstCol}`] = cols.length;
+    delete sec.rowspans[`${r}_${firstCol}`];
+  }
+
+  // Vertical merge: one column, multiple rows.
+  if (uniqueCols.length === 1 && uniqueRows.length >= 2) {
+    const c = uniqueCols[0];
+    const rows = uniqueRows;
+    const firstRow = rows[0];
+    // Always anchor vertical merges at the top-most selected cell.
+    tablePrimaryCell = { row: firstRow, col: c };
+    const nonPrimaryHasContent = rows.slice(1).some(r => hasCellContent(sec.rows[r] && sec.rows[r][c]));
+    if (nonPrimaryHasContent) {
+      const ok = confirm('One or more cells being merged contain content. Any content not in the primary cell will be deleted. Continue?');
+      if (!ok) return;
+    }
+
+    // Keep primary cell content exactly as-is; all non-primary cells are removed.
+    rows.slice(1).forEach(r => { if (sec.rows[r]) sec.rows[r][c] = null; });
+
+    if (!sec.rowspans) sec.rowspans = {};
+    if (!sec.colspans) sec.colspans = {};
+    sec.rowspans[`${firstRow}_${c}`] = rows.length;
+    delete sec.colspans[`${firstRow}_${c}`];
+  }
+
   tableSelCells = [];
+  tablePrimaryCell = null;
+  validateTableState(sec);
   pushHist(); skipSaveOnRender = true; renderCanvas();
+}
+
+function unmergePrimaryCell(id) {
+  if (!selectedId || selectedId !== id || !tablePrimaryCell) return;
+  saveActiveEditable();
+  const sec = getSec(id); if (!sec || !sec.rows) return;
+
+  const key = `${tablePrimaryCell.row}_${tablePrimaryCell.col}`;
+  const colSpan = parseInt((sec.colspans && sec.colspans[key]) || 1, 10);
+  const rowSpan = parseInt((sec.rowspans && sec.rowspans[key]) || 1, 10);
+  if (colSpan <= 1 && rowSpan <= 1) return;
+
+  for (let rr = tablePrimaryCell.row; rr < tablePrimaryCell.row + rowSpan; rr++) {
+    for (let cc = tablePrimaryCell.col; cc < tablePrimaryCell.col + colSpan; cc++) {
+      if (rr === tablePrimaryCell.row && cc === tablePrimaryCell.col) continue;
+      if (sec.rows[rr] && sec.rows[rr][cc] === null) sec.rows[rr][cc] = '';
+    }
+  }
+
+  if (sec.colspans) delete sec.colspans[key];
+  if (sec.rowspans) delete sec.rowspans[key];
+
+  validateTableState(sec);
+  pushHist();
+  skipSaveOnRender = true;
+  renderCanvas();
+  setTimeout(() => updateCellSelection(id), 0);
 }
 
 // Table cell drag-select
 let _tDragging = false;
+let _tDragAnchor = null;
+function _setTableSelectionRect(secId, r, c) {
+  if (!tableDragStart || tableDragStart.secId !== secId) return;
+  const r0 = Math.min(tableDragStart.row, r), r1 = Math.max(tableDragStart.row, r);
+  const c0 = Math.min(tableDragStart.col, c), c1 = Math.max(tableDragStart.col, c);
+  tableSelCells = [];
+  for (let rr = r0; rr <= r1; rr++) {
+    for (let cc = c0; cc <= c1; cc++) {
+      tableSelCells.push({row:rr, col:cc});
+    }
+  }
+  updateCellSelection(secId);
+}
 function tableDragBegin(e, secId, r, c) {
   if (e.button !== 0) return;
-  _tDragging = true;
+  if (selectedId !== secId) selectSec(secId);
+  _tDragging = false;
+  _tDragAnchor = { x: e.clientX, y: e.clientY };
+  tableActiveSecId = secId;
   tableSelCells = [{row:r, col:c}];
+  tablePrimaryCell = {row:r, col:c};
   tableDragStart = {secId, row:r, col:c};
   updateCellSelection(secId);
 }
 function tableDragOver(e, secId, r, c) {
   if (!_tDragging || !tableDragStart || tableDragStart.secId !== secId) return;
-  const r0 = Math.min(tableDragStart.row, r), r1 = Math.max(tableDragStart.row, r);
-  const c0 = Math.min(tableDragStart.col, c), c1 = Math.max(tableDragStart.col, c);
-  tableSelCells = [];
-  for (let rr = r0; rr <= r1; rr++)
-    for (let cc = c0; cc <= c1; cc++)
-      tableSelCells.push({row:rr, col:cc});
-  updateCellSelection(secId);
+  _setTableSelectionRect(secId, r, c);
 }
-document.addEventListener('mouseup', () => { _tDragging = false; });
+document.addEventListener('mousemove', (e) => {
+  if (!tableDragStart || !(e.buttons & 1)) return;
+
+  if (!_tDragging && _tDragAnchor) {
+    const dx = Math.abs(e.clientX - _tDragAnchor.x);
+    const dy = Math.abs(e.clientY - _tDragAnchor.y);
+    if (dx >= 3 || dy >= 3) _tDragging = true;
+  }
+  if (!_tDragging) return;
+
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const td = el && el.closest('[data-field="cell"][data-sec-id]');
+  if (!td) return;
+  if (td.dataset.secId !== tableDragStart.secId) return;
+
+  const r = parseInt(td.dataset.row, 10);
+  const c = parseInt(td.dataset.col, 10);
+  if (Number.isNaN(r) || Number.isNaN(c)) return;
+  _setTableSelectionRect(tableDragStart.secId, r, c);
+});
+
+document.addEventListener('mouseup', () => {
+  _tDragging = false;
+  _tDragAnchor = null;
+  tableDragStart = null;
+});
 function updateCellSelection(secId) {
+  const sectionEl = document.querySelector(`.note-section[data-id="${secId}"]`);
+  if (sectionEl) sectionEl.classList.toggle('table-merge-selecting', tableSelCells.length > 1);
+
   document.querySelectorAll(`[data-sec-id="${secId}"][data-field="cell"]`).forEach(td => {
     const r = parseInt(td.dataset.row), c = parseInt(td.dataset.col);
     td.classList.toggle('cell-selected', tableSelCells.some(s => s.row===r && s.col===c));
+    td.classList.toggle('cell-primary-selected', !!tablePrimaryCell && tablePrimaryCell.row===r && tablePrimaryCell.col===c);
   });
+
+  updateQuickMergeBubble(secId);
+  updateTableEdgeBubbles(secId);
+}
+
+function clearTableSelection() {
+  const clearSecId = tableActiveSecId || selectedId;
+  if (clearSecId) {
+    document.querySelectorAll(`[data-sec-id="${clearSecId}"][data-field="cell"]`).forEach(td => {
+      td.classList.remove('cell-selected', 'cell-primary-selected');
+    });
+  }
+  tableSelCells = [];
+  tablePrimaryCell = null;
+  tableDragStart = null;
+  tableActiveSecId = null;
+  const bubble = document.getElementById('quick-merge-bubble');
+  if (bubble) bubble.classList.remove('visible');
+  hideTableEdgeBubbles();
+}
+
+function hideTableEdgeBubbles() {
+  const colBubble = document.getElementById('quick-col-bubble');
+  const rowBubble = document.getElementById('quick-row-bubble');
+  const hintBubble = document.getElementById('quick-cell-hint');
+  if (colBubble) colBubble.classList.remove('visible');
+  if (rowBubble) rowBubble.classList.remove('visible');
+  if (hintBubble) hintBubble.classList.remove('visible');
+}
+
+function syncTableFloatingControls() {
+  const mergeBubble = document.getElementById('quick-merge-bubble');
+  const sec = selectedId ? getSec(selectedId) : null;
+  const sameActiveTable = !!sec && sec.type === 'table' && tableActiveSecId === selectedId;
+
+  if (!sameActiveTable || !tablePrimaryCell || !tableSelCells.length) {
+    if (mergeBubble) mergeBubble.classList.remove('visible');
+    hideTableEdgeBubbles();
+
+    if (!sameActiveTable) {
+      tableSelCells = [];
+      tablePrimaryCell = null;
+      tableDragStart = null;
+      tableActiveSecId = null;
+    }
+    return;
+  }
+
+  updateCellSelection(selectedId);
+}
+
+function updateTableEdgeBubbles(secId) {
+  const colBubble = document.getElementById('quick-col-bubble');
+  const rowBubble = document.getElementById('quick-row-bubble');
+  const hintBubble = document.getElementById('quick-cell-hint');
+  const hintText = document.getElementById('quick-cell-text');
+  if (!colBubble || !rowBubble || !hintBubble || !hintText) return;
+
+  if (!selectedId || selectedId !== secId || !tablePrimaryCell || !tableSelCells.length) {
+    hideTableEdgeBubbles();
+    return;
+  }
+
+  const anchor = document.querySelector(`[data-sec-id="${secId}"][data-field="cell"][data-row="${tablePrimaryCell.row}"][data-col="${tablePrimaryCell.col}"]`);
+  const table = anchor && anchor.closest('.note-table');
+  if (!anchor || !table) {
+    hideTableEdgeBubbles();
+    return;
+  }
+
+  const aRect = anchor.getBoundingClientRect();
+  const tRect = table.getBoundingClientRect();
+
+  const bubbleGap = 40;
+  colBubble.style.left = `${Math.round(aRect.left + (aRect.width / 2))}px`;
+  colBubble.style.top = `${Math.round(tRect.top - bubbleGap)}px`;
+  colBubble.style.transform = 'translateX(-50%)';
+
+  rowBubble.style.left = `${Math.round(tRect.left - bubbleGap)}px`;
+  rowBubble.style.top = `${Math.round(aRect.top + (aRect.height / 2))}px`;
+  rowBubble.style.transform = 'translateY(-50%)';
+
+  hintText.textContent = getCurrentTableCoordLabel();
+  hintBubble.style.left = `${Math.round(aRect.right + 10)}px`;
+  hintBubble.style.top = `${Math.round(tRect.top - bubbleGap + 2)}px`;
+  hintBubble.style.transform = 'translateY(0)';
+
+  colBubble.classList.add('visible');
+  rowBubble.classList.add('visible');
+  hintBubble.classList.add('visible');
+}
+
+function quickTableRowAdd() {
+  quickTableRowAddAfter();
+}
+function quickTableRowAddAfter() {
+  if (!selectedId || !tablePrimaryCell) return;
+  const sec = getSec(selectedId); if (!sec || !sec.rows) return;
+  const idx = Math.max(0, Math.min(tablePrimaryCell.row + 1, sec.rows.length));
+  addTableRowAt(selectedId, idx);
+  tableSelCells = [{ row: idx, col: Math.min(tablePrimaryCell.col, (sec.rows[0] || []).length - 1) }];
+  tablePrimaryCell = { ...tableSelCells[0] };
+  tableActiveSecId = selectedId;
+  setTimeout(() => updateCellSelection(selectedId), 0);
+}
+function quickTableRowRemove() {
+  if (!selectedId || !tablePrimaryCell) return;
+  const sec = getSec(selectedId); if (!sec || !sec.rows || sec.rows.length <= 1) return;
+  const removeIdx = Math.max(0, Math.min(tablePrimaryCell.row, sec.rows.length - 1));
+  removeTableRowAt(selectedId, removeIdx);
+  const nextRow = Math.max(0, Math.min(removeIdx - 1, sec.rows.length - 2));
+  tableSelCells = [{ row: nextRow, col: tablePrimaryCell.col }];
+  tablePrimaryCell = { ...tableSelCells[0] };
+  tableActiveSecId = selectedId;
+  setTimeout(() => updateCellSelection(selectedId), 0);
+}
+function quickTableColAdd() {
+  quickTableColAddAfter();
+}
+function quickTableColAddAfter() {
+  if (!selectedId || !tablePrimaryCell) return;
+  const sec = getSec(selectedId); if (!sec || !sec.rows) return;
+  const cols = sec.rows[0] ? sec.rows[0].length : 0;
+  const idx = Math.max(0, Math.min(tablePrimaryCell.col + 1, cols));
+  addTableColAt(selectedId, idx);
+  tableSelCells = [{ row: tablePrimaryCell.row, col: idx }];
+  tablePrimaryCell = { ...tableSelCells[0] };
+  tableActiveSecId = selectedId;
+  setTimeout(() => updateCellSelection(selectedId), 0);
+}
+function quickTableColRemove() {
+  if (!selectedId || !tablePrimaryCell) return;
+  const sec = getSec(selectedId); if (!sec || !sec.rows) return;
+  const cols = sec.rows[0] ? sec.rows[0].length : 0;
+  if (cols <= 1) return;
+  const removeIdx = Math.max(0, Math.min(tablePrimaryCell.col, cols - 1));
+  removeTableColAt(selectedId, removeIdx);
+  const nextCol = Math.max(0, removeIdx - 1);
+  tableSelCells = [{ row: tablePrimaryCell.row, col: nextCol }];
+  tablePrimaryCell = { ...tableSelCells[0] };
+  tableActiveSecId = selectedId;
+  setTimeout(() => updateCellSelection(selectedId), 0);
+}
+
+function updateQuickMergeBubble(secId) {
+  const bubble = document.getElementById('quick-merge-bubble');
+  if (!bubble) return;
+  if (!selectedId || selectedId !== secId || tableSelCells.length < 2) {
+    bubble.classList.remove('visible');
+    return;
+  }
+
+  const minRow = Math.min(...tableSelCells.map(s => s.row));
+  const rowCells = tableSelCells.filter(s => s.row === minRow).sort((a,b) => a.col - b.col);
+  let anchor = null;
+  for (const cell of rowCells) {
+    anchor = document.querySelector(`[data-sec-id="${secId}"][data-field="cell"][data-row="${cell.row}"][data-col="${cell.col}"]`);
+    if (anchor) break;
+  }
+  if (!anchor) {
+    bubble.classList.remove('visible');
+    return;
+  }
+
+  const rect = anchor.getBoundingClientRect();
+  bubble.style.left = `${Math.round(rect.left + rect.width / 2)}px`;
+  bubble.style.top = `${Math.round(rect.top - 34)}px`;
+  bubble.style.transform = 'translateX(-50%)';
+  bubble.classList.add('visible');
+}
+
+function quickMergeSelection() {
+  if (!selectedId || tableSelCells.length < 2) return;
+  mergeSelectedCells(selectedId);
 }
 function applySelCellBg(secId, color) {
   saveActiveEditable();
@@ -1467,6 +2478,7 @@ function buildActionBar(sec) {
 // ── FLOAT PANEL ───────────────────────────────────────────────────────────────
 function selectSec(id) {
   selectedId = id;
+  if (tableActiveSecId !== id) clearTableSelection();
   document.querySelectorAll('.note-section').forEach(el => el.classList.toggle('active', el.dataset.id === id));
   openPanel(id);
 }
@@ -1478,6 +2490,7 @@ function openPanel(id) {
 }
 function closePanel() {
   saveActiveEditable();
+  clearTableSelection();
   document.getElementById('float-panel').classList.remove('visible');
   selectedId = null; showingGlobal = false;
   document.getElementById('btn-global').classList.remove('active');
@@ -1488,6 +2501,7 @@ function toggleGlobalPanel() {
   const btn   = document.getElementById('btn-global');
   if (showingGlobal && panel.classList.contains('visible')) { closePanel(); return; }
   saveActiveEditable();
+  clearTableSelection();
   selectedId = null; showingGlobal = true;
   document.querySelectorAll('.note-section').forEach(el => el.classList.remove('active'));
   btn.classList.add('active');
@@ -1512,7 +2526,7 @@ function renderFpBody() {
     body.innerHTML = globalControls();
     return;
   }
-  tabs.style.display = '';
+  tabs.style.display = 'none';
   if (!selectedId) {
     title.innerHTML = 'Style';
     body.innerHTML = `<div class="no-sel">
@@ -1526,25 +2540,70 @@ function renderFpBody() {
   const iconMap = {
     heading:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h8M4 18h12"/></svg>`,
     paragraph: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3H5l-2 2 2 16h14l2-16z"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="14" y2="16"/></svg>`,
+    rawhtml:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6 3 12l5 6"/><path d="m16 6 5 6-5 6"/><path d="m14 4-4 16"/></svg>`,
     list:      `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>`,
     table:     `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg>`,
     divider:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="12" x2="22" y2="12"/></svg>`,
     spacer:    `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="5" rx="1"/><rect x="4" y="17" width="16" height="5" rx="1"/><line x1="12" y1="8" x2="12" y2="16"/></svg>`,
   };
   title.innerHTML = `${iconMap[sec.type]||''} ${sec.label}`;
-  body.innerHTML = activeTab === 'style' ? styleControls(sec) : contentControls(sec);
+  body.innerHTML =
+    `<div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Style</div>` +
+    styleControls(sec) +
+    `<hr class="panel-sep">` +
+    `<div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Content</div>` +
+    contentControls(sec);
 }
 
 // ── CONTROL BUILDERS ─────────────────────────────────────────────────────────
 function row(lbl, inp) { return `<div class="cr"><label>${lbl}</label>${inp}</div>`; }
 
-function fmtToolbar() {
+function headingPreview(level) {
+  const code = (level || 'h3').toUpperCase();
+  const lbl = {
+    h1: 'Main Title',
+    h2: 'Section Title',
+    h3: 'Subsection',
+    h4: 'Minor Heading',
+    h5: 'Small Heading',
+    h6: 'Caption Heading',
+  };
+  const safeLevel = level || 'h3';
+  return `<span class="heading-level-preview-wrap"><span class="heading-level-code">${code} -</span><span class="heading-level-preview ${safeLevel}">${lbl[safeLevel] || 'Subsection'}</span></span>`;
+}
+
+function toggleHeadingLevelMenu(btn) {
+  const dd = btn.closest('.heading-level-dropdown');
+  if (!dd) return;
+  document.querySelectorAll('.heading-level-dropdown.open').forEach(el => {
+    if (el !== dd) el.classList.remove('open');
+  });
+  dd.classList.toggle('open');
+}
+
+function pickHeadingLevel(secId, level, btn) {
+  const dd = btn && btn.closest('.heading-level-dropdown');
+  if (dd) dd.classList.remove('open');
+  notePropChange(secId, 'level', level);
+}
+
+if (!window.__headingLevelMenuBound) {
+  window.__headingLevelMenuBound = true;
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.heading-level-dropdown')) {
+      document.querySelectorAll('.heading-level-dropdown.open').forEach(el => el.classList.remove('open'));
+    }
+  });
+}
+
+function fmtToolbar(toolbarPrefix = '') {
   const svgB    = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 0 8H6z"/><path d="M6 12h9a4 4 0 0 1 0 8H6z"/></svg>`;
   const svgI    = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>`;
   const svgU    = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" y1="20" x2="20" y2="20"/></svg>`;
   const svgS    = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><path d="M16 6c0-1.7-1.8-3-4-3s-4 1.3-4 3c0 3 8 3 8 6 0 1.7-1.8 3-4 3s-4-1.3-4-3"/></svg>`;
   const svgClr  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/><line x1="2" y1="2" x2="22" y2="22"/></svg>`;
   return `<div class="fmt-toolbar">
+    ${toolbarPrefix || ''}
     <div class="fmt-group">
       <button class="fmt-btn" title="Bold"          onclick="fmt('bold')">${svgB}</button>
       <button class="fmt-btn" title="Italic"        onclick="fmt('italic')">${svgI}</button>
@@ -1567,13 +2626,70 @@ function fmtToolbar() {
 }
 
 function fmt(cmd, val) {
+  if (applyTableSelectionTextStyle(cmd, val)) {
+    pushHist();
+    skipSaveOnRender = true;
+    renderCanvas();
+    return;
+  }
   document.execCommand(cmd, false, val || null);
   applyToSmartFields(cmd);
 }
 function fmtColor(val) {
+  if (applyTableSelectionTextStyle('color', val)) {
+    pushHist();
+    skipSaveOnRender = true;
+    renderCanvas();
+    return;
+  }
   document.execCommand('foreColor', false, val);
   applyToSmartFields('color', val);
 }
+
+function applyTableSelectionTextStyle(cmd, val) {
+  if (!selectedId) return false;
+  const sec = getSec(selectedId);
+  if (!sec || sec.type !== 'table' || !tableSelCells.length) return false;
+
+  if (!sec.cellTextStyles) sec.cellTextStyles = {};
+  const keys = tableSelCells
+    .map(({row, col}) => `${row}_${col}`)
+    .filter((k, i, arr) => arr.indexOf(k) === i)
+    .filter(k => {
+      const [r, c] = k.split('_').map(Number);
+      return sec.rows[r] && sec.rows[r][c] !== null;
+    });
+  if (!keys.length) return false;
+
+  if (cmd === 'removeFormat') {
+    keys.forEach(k => { delete sec.cellTextStyles[k]; });
+    return true;
+  }
+
+  const map = {
+    bold: ['fontWeight', '700'],
+    italic: ['fontStyle', 'italic'],
+    underline: ['textDecoration', 'underline'],
+    strikeThrough: ['textDecoration', 'line-through'],
+    color: ['color', val]
+  };
+  const entry = map[cmd];
+  if (!entry) return false;
+  const [prop, target] = entry;
+
+  const allApplied = keys.every(k => (sec.cellTextStyles[k] || {})[prop] === target);
+  keys.forEach(k => {
+    if (!sec.cellTextStyles[k]) sec.cellTextStyles[k] = {};
+    if (allApplied) {
+      delete sec.cellTextStyles[k][prop];
+      if (!Object.keys(sec.cellTextStyles[k]).length) delete sec.cellTextStyles[k];
+    } else {
+      sec.cellTextStyles[k][prop] = target;
+    }
+  });
+  return true;
+}
+
 function applyToSmartFields(cmd, val) {
   const el = lastFocusedEditable; if (!el) return;
   const spans = el.querySelectorAll('.mceNonEditable');
@@ -1593,33 +2709,37 @@ function applyToSmartFields(cmd, val) {
 
 function styleControls(sec) {
   const id = sec.id;
-  const bgRow = `<hr class="panel-sep">${row('Section background', `<input type="color" value="${sec.bg||'#ffffff'}" onchange="notePropChange('${id}','bg',this.value)">`)}`;
+  const sectionLevelLabel = `<div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Section Level</div>`;
+  const sectionControls = `${row('Section background', `<input type="color" value="${sec.bg||'#ffffff'}" onchange="notePropChange('${id}','bg',this.value)">`)}
+    ${row('Section', `<input type="checkbox" ${sec.underline?'checked':''} onchange="notePropChange('${id}','underline',this.checked)">`)}
+    ${row('Line color', `<input type="color" value="${sec.underlineColor||'#e2ddd8'}" onchange="notePropChange('${id}','underlineColor',this.value)">`)}
+    ${row('Line width', `<input type="number" value="${sec.underlineWidth||1}" min="1" max="6" oninput="notePropChange('${id}','underlineWidth',parseInt(this.value)||1)" style="width:65px">`)}`;
+  const sectionLevelBlock = `<hr class="panel-sep">${sectionLevelLabel}${sectionControls}`;
 
   switch(sec.type) {
     case 'heading': {
-      const lvl = sec.level || 'h3';
-      const levels = ['h1','h2','h3','h4','h5','h6'];
-      const picker = `<div class="heading-level-picker">${levels.map(l =>
-        `<button class="hl-btn${lvl===l?' active':''}" onclick="notePropChange('${id}','level','${l}')">${l.toUpperCase()}</button>`
-      ).join('')}</div>`;
-      return `<div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Heading Level</div>
-        ${picker}
-        <hr class="panel-sep">
-        ${row('Text color', `<input type="color" value="${sec.color||'#1a1714'}" onchange="notePropChange('${id}','color',this.value)">`)}
-        ${bgRow}`;
+      return sectionLevelBlock;
     }
     case 'paragraph':
-      return row('Text color hint', `<div style="font-size:11px;color:var(--text2);">Use the toolbar in Content tab.</div>`) + bgRow;
+    case 'rawhtml':
+      return sectionLevelBlock;
     case 'list':
-      return row('List type',`<select onchange="notePropChange('${id}','listType',this.value)"><option value="ul"${sec.listType==='ul'?' selected':''}>Bullet (•)</option><option value="ol"${sec.listType==='ol'?' selected':''}>Numbered (1.)</option></select>`) + bgRow;
+      return row('List type',`<select onchange="notePropChange('${id}','listType',this.value)"><option value="ul"${sec.listType==='ul'?' selected':''}>Bullet (•)</option><option value="ol"${sec.listType==='ol'?' selected':''}>Numbered (1.)</option></select>`) +
+        sectionLevelBlock;
     case 'spacer':
-      return row('Height (px)', `<input type="number" value="${sec.height||20}" min="4" max="120" oninput="notePropChange('${id}','height',parseInt(this.value))" style="width:65px">`) + bgRow;
+      return row('Height (px)', `<input type="number" value="${sec.height||20}" min="4" max="120" oninput="notePropChange('${id}','height',parseInt(this.value))" style="width:65px">`) +
+        `<hr class="panel-sep">` + row('Section background', `<input type="color" value="${sec.bg||'#ffffff'}" onchange="notePropChange('${id}','bg',this.value)">`);
     case 'table': {
+      const firstSel = tableSelCells.length ? tableSelCells[0] : null;
+      const firstSelKey = firstSel ? `${firstSel.row}_${firstSel.col}` : '';
+      const selColor = firstSel && sec.cellBgs && sec.cellBgs[firstSelKey]
+        ? sec.cellBgs[firstSelKey]
+        : (sec.hasHeaderRow && firstSel && firstSel.row === 0 ? '#f2f0ed' : '#ffffff');
       const selInfo = tableSelCells.length
         ? `<div style="font-size:10px;color:var(--text2);margin-bottom:6px;">${tableSelCells.length} cell${tableSelCells.length>1?'s':''} selected</div>
-           ${row('Cell background', `<input type="color" value="#ffffff" onchange="applySelCellBg('${id}',this.value)">`)}`
+          ${row('Cell background', `<input type="color" value="${selColor}" onchange="applySelCellBg('${id}',this.value)">`)}`
         : `<div style="font-size:10px;color:var(--text3);">Click and drag across cells to select, then apply a background color.</div>`;
-      return selInfo + bgRow;
+      return selInfo + `<hr class="panel-sep">` + row('Section background', `<input type="color" value="${sec.bg||'#ffffff'}" onchange="notePropChange('${id}','bg',this.value)">`);
     }
     case 'divider':
       return `<div style="font-size:11px;color:var(--text2);">Visual separator — no style options.</div>`;
@@ -1636,14 +2756,38 @@ function contentControls(sec) {
   </div>` : '';
 
   switch(sec.type) {
-    case 'heading':
-      return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click the heading to edit. Use the Style tab to change heading level (H1–H6) and color.</div>` + fmtToolbar();
+    case 'heading': {
+      const lvl = sec.level || 'h3';
+      const headingToolbarSelector = `<div class="heading-level-picker">
+          <div class="heading-level-dropdown">
+            <button type="button" class="heading-level-current" onclick="toggleHeadingLevelMenu(this)">
+              ${headingPreview(lvl)}
+              <span class="heading-level-caret">v</span>
+            </button>
+            <div class="heading-level-menu">
+              <button type="button" class="heading-level-option${lvl==='h1'?' active':''}" onclick="pickHeadingLevel('${sec.id}','h1',this)">${headingPreview('h1')}</button>
+              <button type="button" class="heading-level-option${lvl==='h2'?' active':''}" onclick="pickHeadingLevel('${sec.id}','h2',this)">${headingPreview('h2')}</button>
+              <button type="button" class="heading-level-option${lvl==='h3'?' active':''}" onclick="pickHeadingLevel('${sec.id}','h3',this)">${headingPreview('h3')}</button>
+              <button type="button" class="heading-level-option${lvl==='h4'?' active':''}" onclick="pickHeadingLevel('${sec.id}','h4',this)">${headingPreview('h4')}</button>
+              <button type="button" class="heading-level-option${lvl==='h5'?' active':''}" onclick="pickHeadingLevel('${sec.id}','h5',this)">${headingPreview('h5')}</button>
+              <button type="button" class="heading-level-option${lvl==='h6'?' active':''}" onclick="pickHeadingLevel('${sec.id}','h6',this)">${headingPreview('h6')}</button>
+            </div>
+          </div>
+        </div>`;
+      return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:6px;">Click the heading to edit. Use the selector to change level, then format text as needed.</div>` + fmtToolbar(headingToolbarSelector);
+    }
     case 'paragraph':
       return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click the text to edit. Use the toolbar to format selected text or insert bookmarks.</div>` + fmtToolbar();
+    case 'rawhtml':
+      return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:6px;">This is a fixed HTML layout block for complex forms. Click directly in the layout to edit copy or placeholders.</div>`;
     case 'list':
       return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click any list item to edit. Use + Add item to add more.</div>` + fmtToolbar();
     case 'table':
-      return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click any cell to edit. Drag across cells to select multiple. Use toolbar to format text or insert bookmarks.</div>` + fmtToolbar();
+      return sfLegend + `<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Click any cell to edit. Drag across cells to select multiple. Use toolbar to format text or insert bookmarks.</div>
+        <div style="font-size:10px;color:var(--text2);margin-bottom:6px;">Active cell: <strong>${getCurrentTableCoordLabel()}</strong></div>
+        <div class="table-secondary-actions" style="margin-bottom:8px;">
+          <button class="tbl-btn" onclick="toggleHeaderRow('${sec.id}')">${sec.hasHeaderRow?'Remove':'Add'} Header</button>
+        </div>` + fmtToolbar();
     case 'divider':
       return `<div style="font-size:11px;color:var(--text2);">A horizontal rule — no content to edit.</div>`;
     case 'spacer':
@@ -1990,6 +3134,112 @@ document.getElementById('mf-trigger-search').addEventListener('keydown', functio
 });
 document.addEventListener('mousedown', function(e) {
   if (triggerActive && !e.target.closest('#mf-trigger')) { closeTrigger(); }
+
+  if (!e.target.closest('[data-field="cell"][data-sec-id]') && !e.target.closest('#quick-merge-bubble') && !e.target.closest('#quick-col-bubble') && !e.target.closest('#quick-row-bubble')) {
+    clearTableSelection();
+  }
+});
+
+function openShortcutsModal() {
+  const el = document.getElementById('shortcuts-modal');
+  if (el) el.classList.add('open');
+}
+function closeShortcutsModal() {
+  const el = document.getElementById('shortcuts-modal');
+  if (el) el.classList.remove('open');
+}
+
+function findTableCell(secId, row, col, dr, dc) {
+  const sec = getSec(secId);
+  if (!sec || !sec.rows || !sec.rows.length) return null;
+  const maxR = sec.rows.length - 1;
+  const maxC = sec.rows[0].length - 1;
+  let rr = Math.max(0, Math.min(row, maxR));
+  let cc = Math.max(0, Math.min(col, maxC));
+  for (let i = 0; i < 60; i++) {
+    const el = document.querySelector(`[data-sec-id="${secId}"][data-field="cell"][data-row="${rr}"][data-col="${cc}"]`);
+    if (el) return { el, row: rr, col: cc };
+    rr += dr;
+    cc += dc;
+    if (rr < 0 || rr > maxR || cc < 0 || cc > maxC) break;
+  }
+  return null;
+}
+
+document.addEventListener('keydown', function(e) {
+  const typingTarget = e.target && (e.target.matches('[contenteditable]') || e.target.matches('input,textarea,select'));
+  if (e.key === 'Escape') {
+    closeShortcutsModal();
+    return;
+  }
+  if (!typingTarget && e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    e.preventDefault();
+    openShortcutsModal();
+    return;
+  }
+
+  if (selectedId && e.altKey && e.shiftKey && !e.metaKey && !e.ctrlKey) {
+    if (e.key === 'ArrowUp') { e.preventDefault(); moveSection(selectedId, -1); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); moveSection(selectedId, 1); return; }
+  }
+
+  const active = document.activeElement;
+  if (!active || !active.matches('[contenteditable][data-field="cell"][data-sec-id]')) return;
+  const secId = active.dataset.secId;
+  const row = parseInt(active.dataset.row, 10);
+  const col = parseInt(active.dataset.col, 10);
+  if (Number.isNaN(row) || Number.isNaN(col)) return;
+
+  let dr = 0, dc = 0;
+  if (e.key === 'ArrowLeft') dc = -1;
+  else if (e.key === 'ArrowRight') dc = 1;
+  else if (e.key === 'ArrowUp') dr = -1;
+  else if (e.key === 'ArrowDown') dr = 1;
+  else if (e.key === 'Tab') dc = e.shiftKey ? -1 : 1;
+  else return;
+
+  e.preventDefault();
+  const next = findTableCell(secId, row + dr, col + dc, dr || 0, dc || 0);
+  if (!next) return;
+  next.el.focus();
+  const r = document.createRange();
+  r.selectNodeContents(next.el);
+  r.collapse(false);
+  const s = window.getSelection();
+  s.removeAllRanges();
+  s.addRange(r);
+
+  tableActiveSecId = secId;
+  tableSelCells = [{ row: next.row, col: next.col }];
+  tablePrimaryCell = { row: next.row, col: next.col };
+  updateCellSelection(secId);
+}, true);
+
+window.runEditorSelfCheck = function runEditorSelfCheck() {
+  const issues = [];
+  sections.forEach(sec => {
+    if (sec.type !== 'table') return;
+    const before = JSON.stringify(sec.rows || []);
+    validateTableState(sec);
+    const after = JSON.stringify(sec.rows || []);
+    if (before !== after) issues.push(`Normalized inconsistent table rows in ${sec.id}`);
+    const colLen = sec.rows && sec.rows[0] ? sec.rows[0].length : 0;
+    if (!Array.isArray(sec.rows) || !sec.rows.length || colLen < 1) issues.push(`Invalid table shape in ${sec.id}`);
+  });
+  return { ok: issues.length === 0, issues };
+};
+
+window.addEventListener('scroll', () => {
+  if (selectedId) {
+    updateQuickMergeBubble(selectedId);
+    updateTableEdgeBubbles(selectedId);
+  }
+}, true);
+window.addEventListener('resize', () => {
+  if (selectedId) {
+    updateQuickMergeBubble(selectedId);
+    updateTableEdgeBubbles(selectedId);
+  }
 });
 
 // ── FIND & REPLACE ────────────────────────────────────────────────────────────
@@ -2062,6 +3312,10 @@ function buildNoteHTML() {
         html += `<p>${sanitizeForMCE(sec.html)}</p>`;
         break;
 
+      case 'rawhtml':
+        html += sanitizeForMCE(sec.html);
+        break;
+
       case 'list': {
         // Plain <ul>/<ol> and <li> — no attributes on anything
         const tag = sec.listType || 'ul';
@@ -2073,17 +3327,33 @@ function buildNoteHTML() {
       }
 
       case 'table': {
+        const cellBgs = sec.cellBgs || {};
         const colspans = sec.colspans || {};
+        const rowspans = sec.rowspans || {};
+        const colWidths = Array.isArray(sec.colWidths) ? sec.colWidths : [];
+        const cellTextStyles = sec.cellTextStyles || {};
+        const showBorders = sec.showBorders !== false;
+        const cellPadding = sec.cellPadding || '7px 10px';
+        const tableStyle = sec.tableStyle || 'width:100%;border-collapse:collapse;font-size:13px;margin:4px 0;';
+        const colGroup = colWidths.length
+          ? `<colgroup>${colWidths.map(w => `<col style="width:${typeof w === 'number' ? `${w}%` : w};">`).join('')}</colgroup>`
+          : '';
         const rows = (sec.rows || []).map((row, r) => {
           const cells = row.map((cell, c) => {
             if (cell === null) return ''; // merged cell — skip
             const cs = colspans[`${r}_${c}`];
+            const rs = rowspans[`${r}_${c}`];
             const csAttr = cs ? ` colspan="${cs}"` : '';
-            return `<td${csAttr}>${sanitizeForMCE(cell||'')}</td>`;
+            const rsAttr = rs ? ` rowspan="${rs}"` : '';
+            const txt = cellTextStyles[`${r}_${c}`] || {};
+            const bg = cellBgs[`${r}_${c}`] ? `background:${cellBgs[`${r}_${c}`]};` : '';
+            const style = `padding:${cellPadding};vertical-align:top;${showBorders ? 'border:1px solid #666;' : 'border:none;'}${bg}${txt.color ? `color:${txt.color};` : ''}${txt.fontWeight ? `font-weight:${txt.fontWeight};` : ''}${txt.fontStyle ? `font-style:${txt.fontStyle};` : ''}${txt.textDecoration ? `text-decoration:${txt.textDecoration};` : ''}`;
+            const styleAttr = style ? ` style="${style}"` : '';
+            return `<td${csAttr}${rsAttr}${styleAttr}>${sanitizeForMCE(cell||'')}</td>`;
           }).join('');
           return `<tr>${cells}</tr>`;
         }).join('');
-        html += `<table cellspacing="0" cellpadding="0"><tbody>${rows}</tbody></table>`;
+        html += `<table cellspacing="0" cellpadding="0" style="${tableStyle}">${colGroup}<tbody>${rows}</tbody></table>`;
         break;
       }
 
